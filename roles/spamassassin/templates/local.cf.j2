@@ -1,0 +1,176 @@
+# This is the right place to customize your installation of SpamAssassin.
+#
+# See 'perldoc Mail::SpamAssassin::Conf' for details of what can be
+# tweaked.
+#
+# Only a small subset of options are listed below
+#
+###########################################################################
+
+#dns_query_restriction deny dnswl.org surbl.org
+#dns_query_restriction allow zen.spamhaus.org
+#dns_query_restriction deny spamhaus.org mailspike.net spamcop.net
+
+razor_config /etc/mail/spamassassin/razor-agent.conf
+
+ifplugin Mail::SpamAssassin::Plugin::Pyzor
+pyzor_path /usr/bin/pyzor
+pyzor_options --debug --log-file /var/log/pyzor.log --homedir /etc/mail/spamassassin/.pyzor
+endif
+
+# datavibe.net spamassassin local config as of 2015-07-17
+
+#   Add *****SPAM***** to the Subject header of spam e-mails
+#rewrite_header Subject *****SPAM*****
+
+#   Save spam messages as a message/rfc822 MIME attachment instead of
+#   modifying the original message (0: off, 2: use text/plain instead)
+report_safe 1
+
+add_header all RelaysUntrusted _RELAYSUNTRUSTED_
+add_header all Status _YESNO_, score=_SCORE_ required=_REQD_ tests=_TESTS_ autolearn=_AUTOLEARN_ version=_VERSION_
+add_header all Relay-Country _RELAYCOUNTRY_
+
+#   Set the threshold at which a message is considered spam (default: 5.0)
+required_score 5.0
+
+#   Use Bayesian classifier (default: 1)
+use_bayes 1
+
+#   Bayesian classifier auto-learning (default: 1)
+bayes_auto_learn 1
+
+bayes_ignore_header X-Bogosity
+bayes_ignore_header X-Spam-Flag
+bayes_ignore_header X-Spam-Status
+
+# whitelisting
+whitelist_from_rcvd *@mchsi.com                mchsi.com
+whitelist_from_rcvd *@mediacombb.net           mediacombb.net
+whitelist_from_rcvd *@mediacomcc.com           mediacomcc.com
+whitelist_from_rcvd *@mcomdc.com               mcomdc.com
+whitelist_from_rcvd *@qcga.com                 qcga.com
+whitelist_from_rcvd *@incoming.goappletree.com incoming.goappletree.com
+whitelist_from_rcvd *@goappletree.com          goappletree.com
+
+# hetzner
+dns_server 213.133.98.98
+
+header    RCVD_IN_SC_SPAM   eval:check_rbl('spamcannibal', 'bl.spamcannibal.org.')
+describe  RCVD_IN_SC_SPAM   SpamCannibal: sender is a spam source
+tflags    RCVD_IN_SC_SPAM   net
+score   RCVD_IN_SC_SPAM   2.2
+
+# UCEPROTECT1 (open relays/proxys/dialups) http://uceprotect.net
+header          RCVD_IN_UCEPROTECT1 eval:check_rbl_txt('uceprotect1', 'dnsbl-1.uceprotect.net')
+describe        RCVD_IN_UCEPROTECT1 Listed in dnsbl-1.uceprotect.net
+tflags          RCVD_IN_UCEPROTECT1 net
+score           RCVD_IN_UCEPROTECT1 2.2
+
+# UCEPROTECT2 (open relays/proxys/dialups networks) http://uceprotect.net
+header          RCVD_IN_UCEPROTECT2 eval:check_rbl_txt('uceprotect1', 'dnsbl-2.uceprotect.net')
+describe        RCVD_IN_UCEPROTECT2 Network listed in dnsbl-2.uceprotect.net
+tflags          RCVD_IN_UCEPROTECT2 net
+score           RCVD_IN_UCEPROTECT2 1.9
+
+# UCEPROTECT3 (bad networks) http://uceprotect.net
+header          RCVD_IN_UCEPROTECT3 eval:check_rbl_txt('uceprotect1', 'dnsbl-3.uceprotect.net')
+describe        RCVD_IN_UCEPROTECT3 Network listed in dnsbl-3.uceprotect.net
+tflags          RCVD_IN_UCEPROTECT3 net
+score           RCVD_IN_UCEPROTECT3 1.3
+
+header    RCVD_IN_LB_SPAM   eval:check_rbl('lashback', 'ubl.lashback.com')
+describe  RCVD_IN_LB_SPAM   LASHBACK: sender is a spam source
+tflags    RCVD_IN_LB_SPAM   net
+score   RCVD_IN_LB_SPAM   1.9
+
+header    RCVD_IN_BS_SPAM   eval:check_rbl('backscatterer', 'ips.backscatterer.org')
+describe  RCVD_IN_BS_SPAM   BACKSCATTERER: sender is a spam source
+tflags    RCVD_IN_BS_SPAM   net
+score   RCVD_IN_BS_SPAM   1.9
+
+header    RCVD_IN_UNSUBSCORE  eval:check_rbl('unsubscore-lastexternal','ubl.unsubscore.com.')
+describe  RCVD_IN_UNSUBSCORE  Listed in Lashback unsubscore.com
+tflags    RCVD_IN_UNSUBSCORE  net
+score   RCVD_IN_UNSUBSCORE  1.9
+
+header    RCVD_IN_TRUNC   eval:check_rbl('truncate','truncate.gbudb.net')
+describe  RCVD_IN_TRUNC   Listed in truncate.gbudb.net rbl
+tflags    RCVD_IN_TRUNC   net
+score   RCVD_IN_TRUNC   1.9
+
+header          RCVD_IN_S5HBL     eval:check_rbl('s5hbl', 'all.s5h.net')
+describe        RCVD_IN_S5HBL   Listed at all.s5h.net rbl
+tflags          RCVD_IN_S5HBL   net
+score           RCVD_IN_S5HBL   1.9
+
+# MailSpike is included in SpamAssassin 3.4+
+if (version >= 3.004000)
+ifplugin Mail::SpamAssassin::Plugin::DNSEval
+## Spam sources
+header __RCVD_IN_MSPIKE_B eval:check_rbl('mspikeb-lastexternal', 'bl.mailspike.net.')
+tflags __RCVD_IN_MSPIKE_B net
+
+## Ham sources
+header __RCVD_IN_MSPIKE_L eval:check_rbl('mspikeg-firsttrusted', 'wl.mailspike.net.')
+tflags __RCVD_IN_MSPIKE_L net
+
+##### Reputation compensations
+# Definitions - Bad senders
+header __RCVD_IN_MSPIKE_Z eval:check_rbl_sub('mspikeb-lastexternal', '127.0.0.2')
+describe __RCVD_IN_MSPIKE_Z Spam wave participant
+tflags __RCVD_IN_MSPIKE_Z net
+
+header RCVD_IN_MSPIKE_L5  eval:check_rbl_sub('mspikeb-lastexternal', '127.0.0.10')
+describe RCVD_IN_MSPIKE_L5  Very bad reputation (-5)
+tflags RCVD_IN_MSPIKE_L5  net
+
+header RCVD_IN_MSPIKE_L4  eval:check_rbl_sub('mspikeb-lastexternal', '127.0.0.11')
+describe RCVD_IN_MSPIKE_L4  Bad reputation (-4)
+tflags RCVD_IN_MSPIKE_L4  net
+
+header RCVD_IN_MSPIKE_L3  eval:check_rbl_sub('mspikeb-lastexternal', '127.0.0.12')
+describe RCVD_IN_MSPIKE_L3  Low reputation (-3)
+tflags RCVD_IN_MSPIKE_L3  net
+
+header RCVD_IN_MSPIKE_L2  eval:check_rbl_sub('mspikeb-lastexternal', '127.0.0.13')
+describe RCVD_IN_MSPIKE_L2  Suspicious reputation (-2)
+tflags RCVD_IN_MSPIKE_L2  net
+
+# Definitions - Good senders
+header RCVD_IN_MSPIKE_H5  eval:check_rbl_sub('mspikeg-firsttrusted', '127.0.0.20')
+describe RCVD_IN_MSPIKE_H5  Excellent reputation (+5)
+tflags RCVD_IN_MSPIKE_H5  nice net
+
+header RCVD_IN_MSPIKE_H4  eval:check_rbl_sub('mspikeg-firsttrusted', '127.0.0.19')
+describe RCVD_IN_MSPIKE_H4  Very Good reputation (+4)
+tflags RCVD_IN_MSPIKE_H4  nice net
+
+header RCVD_IN_MSPIKE_H3  eval:check_rbl_sub('mspikeg-firsttrusted', '127.0.0.18')
+describe RCVD_IN_MSPIKE_H3  Good reputation (+3)
+tflags RCVD_IN_MSPIKE_H3  nice net
+
+header RCVD_IN_MSPIKE_H2  eval:check_rbl_sub('mspikeg-firsttrusted', '127.0.0.17')
+describe RCVD_IN_MSPIKE_H2  Average reputation (+2)
+tflags RCVD_IN_MSPIKE_H2  nice net
+
+# *_L and *_Z may overlap each other, so account for that
+meta __RCVD_IN_MSPIKE_LOW RCVD_IN_MSPIKE_L5 || RCVD_IN_MSPIKE_L4 || RCVD_IN_MSPIKE_L3
+tflags __RCVD_IN_MSPIKE_LOW net
+
+meta RCVD_IN_MSPIKE_ZBI   __RCVD_IN_MSPIKE_Z && !__RCVD_IN_MSPIKE_LOW
+tflags RCVD_IN_MSPIKE_ZBI net
+
+## Meta rules for aggregating good and bad senders
+# Bad
+meta RCVD_IN_MSPIKE_BL    RCVD_IN_MSPIKE_L5 || RCVD_IN_MSPIKE_L4 || RCVD_IN_MSPIKE_L3 || __RCVD_IN_MSPIKE_Z
+describe RCVD_IN_MSPIKE_BL  Mailspike blacklisted
+tflags RCVD_IN_MSPIKE_BL  net
+
+# Good
+meta RCVD_IN_MSPIKE_WL    RCVD_IN_MSPIKE_H5 || RCVD_IN_MSPIKE_H4 || RCVD_IN_MSPIKE_H3
+describe RCVD_IN_MSPIKE_WL  Mailspike good senders
+tflags RCVD_IN_MSPIKE_WL  nice net
+
+  endif
+endif

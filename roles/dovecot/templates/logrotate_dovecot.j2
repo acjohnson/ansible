@@ -1,0 +1,13 @@
+/var/log/dovecot.log {
+  weekly
+  rotate 5
+  missingok
+  notifempty
+  compress
+  delaycompress
+  create 664 dovecot mail
+  sharedscripts
+  postrotate
+    /usr/bin/doveadm log reopen
+  endscript
+}

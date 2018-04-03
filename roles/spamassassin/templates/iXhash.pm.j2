@@ -1,0 +1,207 @@
+=head1 NAME
+
+Mail::SpamAssassin::Plugin::iXhash - compute fuzzy checksums from mail bodies and compare to known spam ones via DNS
+
+=head1 SYNOPSIS
+  loadplugin    Mail::SpamAssassin::Plugin::iXhash /path/to/iXhash.pm
+  ixhash_timeout        10
+  body          IXHASH eval:ixhashtest('ix.dnsbl.manitu.net')
+  describe      IXHASH This mail has been classified as spam @ iX Magazine, Germany
+  tflags        IXHASH net
+  score         IXHASH 1.5
+
+=head1 DESCRIPTION
+
+iXhash.pm is a plugin for SpamAssassin 3.1.0 and up. It takes the body of a mail, strips parts from it and then computes a hash value from the rest.
+These values will then be looked up via DNS. 
+This plugin is based on parts of the procmail-based project 'NiX Spam', developed by Bert Ungerer.(un@ix.de)
+For more information see http://www.heise.de/ix/nixspam/. The procmail code producing the hashes only can be found here:
+ftp://ftp.ix.de/pub/ix/ix_listings/2004/05/checksums
+
+Parts of the code were submitted via heise forum by 'kungfuhasi'
+See http://www.heise.de/ix/foren/go.shtml?read=1&msg_id=7246759&forum_id=48292.
+
+Martin Blapp (mb@imp.ch) found and solved a problem occuring on Perl 5.8.7. Thanks a lot!
+
+Further improvements (DNS timeouts) by Dallas Engelken (dallase@uribl.com) - see comments for details. 
+
+=cut
+
+package Mail::SpamAssassin::Plugin::iXhash;
+use strict;
+use Mail::SpamAssassin;
+use Mail::SpamAssassin::Plugin;
+use Mail::SpamAssassin::Util;
+use Digest::MD5 qw(md5 md5_hex md5_base64);
+use Net::DNS;
+use Net::DNS::Resolver;
+# Locale - this was on Bert's wishlist
+use POSIX qw(locale_h);
+setlocale(LC_CTYPE, "de_DE.ISO8859-1");
+# LC_CTYPE now "Deutsch, Deutschland, codeset ISO 8859-1"
+# Maybe not appropriate for spam that is neither German nor English
+
+use vars qw(@ISA);
+@ISA = qw(Mail::SpamAssassin::Plugin);
+sub dbg { Mail::SpamAssassin::dbg (@_); }
+sub new {
+        my ($class, $mailsa, $server) = @_;
+        $class = ref($class) || $class;
+        my $self = $class->SUPER::new($mailsa);
+        bless ($self, $class);
+        $self->set_config($mailsa->{conf});
+        $self->register_eval_rule ("ixhashtest");
+        return $self;
+}
+
+
+sub set_config {
+        my ($self, $conf) = @_;
+        my @cmds = ();
+        # implements ixhash_timeout config option - by dallase@uribl.com
+        push(@cmds, {
+                setting => 'ixhash_timeout',
+                default => 5,
+                type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
+        });
+        $conf->{parser}->register_commands(\@cmds);
+}
+
+
+sub ixhashtest {
+        my ($self, $permsgstatus,$muell,$dnsserver) = @_;
+        dbg("IXHASH: IxHash querying Server $dnsserver");
+        my ($digest,$answer,$ixdigest,$body) = "";
+        my @body = $permsgstatus->{msg}->get_body();
+        my $resolver = Net::DNS::Resolver->new;
+        my $body_copy = "";
+        foreach (@body) {
+                $body .= join "", @$_;
+        }
+        my $rr;
+        my $hits = 0;
+        # alarm the dns query - dallase@uribl.com
+        # --------------------------------------------------------------------------
+        # here we implement proper alarms, ala Pyzor, Razor2 plugins. 
+        # keep the alarm as $oldalarm, so we dont loose the timeout-child alarm
+        # see http://issues.apache.org/SpamAssassin/show_bug.cgi?id=3828#c123
+        my $oldalarm = 0;
+        my $timeout = $permsgstatus->{main}->{conf}->{'ixhash_timeout'} || 5;
+        eval {
+                Mail::SpamAssassin::Util::trap_sigalrm_fully(sub { die "ixhash timeout reached"; });
+        $oldalarm = alarm($timeout);
+        
+        #-----------------------------------------------------------------------
+        # Creation of hash # 1 if following conditions are met:
+        # - mail contains at least 16 spaces or tabs 
+        # - mail consists of at least 2 lines
+      # NB:  Edit this if you want to minimize FPs at the cost of not checking shorter mails.
+      # FP ratio will be the higher the shorter the mails are 
+        if (($body =~ /([\s\t].+?){16,}/ ) && ($body =~ /.*$.*/)){
+                # Copy $body into $body_copy - thanks to J. Stehle for pointing this out
+                $body_copy = $body;
+                # All space class chars just one time
+                # Do this in two steps to avoid Perl segfaults
+                # if there are more than 2.600 identical chars to be replaced
+                # Step One
+                $body_copy =~ s/([[:space:]]{100})(?:\1+)/$1/g;
+                # Step Two
+                $body_copy =~ s/([[:space:]])(?:\1+)/$1/g;
+                # remove graph class chars and some specials
+                $body_copy =~ s/[[:graph:]]+//go;
+                # Create actual digest
+                $digest = md5_hex($body_copy);
+                dbg ("IXHASH: Computed hash-value $digest via method 1");
+                dbg ("IXHASH: Now checking $digest.$dnsserver");
+                # Now check via DNS query
+                $answer = $resolver->search($digest.'.'.$dnsserver, "A", "IN");
+                if ($answer) {
+                        foreach $rr ($answer->answer) {
+                                next unless $rr->type eq "A";
+                                dbg ("IXHASH: Received reply from $dnsserver:". $rr->address);
+                                $hits = 1 if $rr->address;
+                        }
+                }
+        }
+        # End of computing hash #1 
+        #---------------------------------------------------------------------
+        
+        
+        #---------------------------------------------------------------------
+        # Creation of hash # 1 if mail contains at least 3 of the following characters:
+        # '[<>()|@*'!?,]' or the combination of ':/'
+        # (To match something like "Already seen?  http:/host.domain.tld/")
+        # edit this if you want to minimize FPs (i.e. make sure that short emails are not checked)
+        # 
+        if ($body =~ /((([<>\(\)\|@\*'!?,])|(:\/)).*?){3,}/m ) {
+                $body_copy = $body;
+                # remove redundant stuff
+                $body_copy =~ s/[[:cntrl:][:alnum:]%&#;=]+//g;
+                # replace '_' with '.'
+                $body_copy =~ tr/_/./;
+                # replace duplicate chars. This too suffers from a bug in perl
+                # so we do it in two steps
+                # Step One
+                $body_copy =~ s/([[:print:]]{100})(?:\1+)/$1/g;
+                # Step Two
+                $body_copy =~ s/([[:print:]])(?:\1+)/$1/g;
+                # Computing hash...
+                $digest = md5_hex($body_copy);
+                dbg ("IXHASH: Computed hash-value $digest via method 2");
+                dbg ("IXHASH: Now checking $digest.$dnsserver");
+                # Now check via DNS query
+                $answer = $resolver->search($digest.'.'.$dnsserver, "A", "IN");
+                if ($answer) {
+                        foreach $rr ($answer->answer) {
+                                next unless $rr->type eq "A";
+                                dbg ("IXHASH: Received reply from $dnsserver:". $rr->address);
+                                $hits = 1 if $rr->address;
+                        }
+                }
+        }
+
+        # End of computing hash #2 
+        #-----------------------------------------------------------------------
+        
+        
+        #-----------------------------------------------------------------------
+        # Compute hash # 3 if 
+        # - there are at least 8 non-empty characters in the body
+        # - neither hash #1 nor hash #2 have been computed
+        if (($body =~ /[\S]{8,}/) and (length($digest) < 32)) {
+                $body_copy = $body;
+                $body_copy =~ s/[[:cntrl:][:space:]=]+//g;
+                # replace duplicate chars. This too suffers from a bug in perl
+                # so we do it in two steps
+                # Step One
+                $body_copy =~ s/([[:print:]]{100})(?:\1+)/$1/g;
+                # Step Two
+                $body_copy =~ s/([[:graph:]])(?:\1+)/$1/g;
+                # Computing actual hash
+                $digest = md5_hex($body_copy);
+                dbg ("IXHASH: Computed hash-value $digest via method 3");
+                dbg ("IXHASH: Now checking $digest.$dnsserver");
+                # Check via DNS
+                $answer = $resolver->search($digest.'.'.$dnsserver, "A", "IN");
+                if ($answer) {
+                        foreach $rr ($answer->answer) {
+                                next unless $rr->type eq "A";
+                                dbg ("IXHASH: Received reply from $dnsserver:". $rr->address);
+                                $hits = 1 if $rr->address;
+                        }
+                }
+        }
+        if (defined $oldalarm) {
+                alarm $oldalarm;  $oldalarm = undef;
+        }
+}; # End of sub ixhashtest
+
+# Error handling - parto of Dallas' code
+if ($@ =~ m/timeout/) {
+        dbg("IXHASH: $timeout second timeout exceeded while checking $digest.$dnsserver");
+}
+
+return $hits;
+
+}
+1;

@@ -1,0 +1,13 @@
+/var/log/denyhosts.log {
+  compress
+  missingok
+  notifempty
+  rotate 5
+  weekly
+  postrotate
+    systemctl start denyhosts
+  endscript
+  prerotate
+    systemctl stop denyhosts
+  endscript
+}

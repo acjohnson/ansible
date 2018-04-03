@@ -1,0 +1,34 @@
+---
+- name: Install base packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - lvm2
+    - xfsprogs
+    - mlocate
+    - vim
+    - git
+    - tig
+    - python-pip
+    - pciutils
+    - lshw
+    - curl
+    - binutils
+
+- name: "sysctl - set swapiness"
+  sysctl:
+    name: vm.swappiness
+    value: 5
+    state: present
+
+- name: "sysctl - disable IPv6"
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    sysctl_set: yes
+  with_items:
+    - net.ipv6.conf.all.disable_ipv6
+    - net.ipv6.conf.default.disable_ipv6
+    - net.ipv6.conf.lo.disable_ipv6
+    - net.ipv6.conf.eth0.disable_ipv6

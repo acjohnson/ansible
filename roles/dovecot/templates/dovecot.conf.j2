@@ -1,0 +1,97 @@
+# 2.1.7: /etc/dovecot/dovecot.conf
+
+auth_mechanisms = plain login
+
+# Remove domain name from username:
+auth_username_format = %Ln
+auth_default_realm = {{ dovecot_domain }}
+base_dir = /var/run/dovecot/
+first_valid_gid = 8
+first_valid_uid = 5000
+info_log_path = /var/log/dovecot.log
+last_valid_gid = 8
+last_valid_uid = 5000
+log_path = /var/log/dovecot.log
+log_timestamp = "%Y-%m-%d %H:%M:%S "
+mail_access_groups = dovecot
+mail_location = maildir:/home/vmail/%d/%n/Maildir
+mail_privileged_group = mail
+
+passdb {
+  args = max_requests=50
+  driver = pam
+}
+
+plugin {
+  sieve_global_path = /etc/dovecot/sieve/global.sieve
+}
+
+protocols = imap
+
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    group = postfix
+    mode = 0660
+    user = postfix
+  }
+
+  unix_listener auth-master {
+    group = mail
+    mode = 0660
+    user = vmail
+  }
+
+  user = dovecot
+}
+
+service anvil {
+  unix_listener anvil-auth-penalty {
+    group = dovecot
+    mode = 0660
+    user = dovecot
+  }
+}
+
+service imap-login {
+  executable = /usr/lib/dovecot/imap-login
+  inet_listener imap {
+    port = 0
+  }
+
+  inet_listener imaps {
+    address = *
+    port = 993
+  }
+
+  process_limit = 32
+}
+
+service imap {
+  executable = /usr/lib/dovecot/imap
+}
+
+ssl=required
+ssl_ca = <{{ dovecot_ssl_ca_file }}
+ssl_cert = <{{ dovecot_ssl_cert_file }}
+ssl_key = <{{ dovecot_ssl_key_file }}
+
+ssl_verify_client_cert = no
+auth_ssl_require_client_cert = no
+auth_ssl_username_from_cert = no
+
+userdb {
+  driver = static
+  args = uid=vmail gid=mail home=/home/vmail/%d/%n allow_all_users=yes
+}
+
+protocol imap {
+  imap_max_line_length = 64 k
+  mail_max_userip_connections = 20
+}
+
+protocol lda {
+  auth_socket_path = /var/run/dovecot/auth-master
+  mail_plugins = sieve
+  postmaster_address = postmaster@{{ dovecot_domain }}
+  sendmail_path = /usr/lib/sendmail
+}

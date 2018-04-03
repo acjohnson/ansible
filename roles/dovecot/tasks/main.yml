@@ -1,0 +1,72 @@
+---
+- name: Install dovecot packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - dovecot-core
+    - dovecot-imapd
+    - dovecot-sieve
+
+- name: Ensure mail group exists
+  group:
+    name: mail
+    gid: 8
+    state: present
+
+- name: Ensure vmail user exists
+  user:
+    name: vmail
+    shell: /bin/false
+    home: /home/vmail
+    uid: 5000
+    group: mail
+    state: present
+
+- name: Configure dovecot
+  template:
+    src: dovecot.conf.j2
+    dest: /etc/dovecot/dovecot.conf
+    mode: 0644
+    owner: dovecot
+    group: mail
+
+- name: Ensure dovecot.log exists
+  file:
+    path: /var/log/dovecot.log
+    state: touch
+    mode: 0644
+    owner: dovecot
+    group: mail
+
+- name: Add logrotate job for dovecot.log
+  template:
+    src: logrotate_dovecot.j2
+    dest: /etc/logrotate.d/dovecot
+    mode: 0644
+
+- name: Ensure dovecot ssl directory exists
+  file:
+    path: "{{ dovecot_ssl_dir }}"
+    state: directory
+    mode: 0700
+    owner: dovecot
+    group: mail
+
+- name: Create SSL certificate files
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ dovecot_ssl_dir }}/{{ item }}"
+    mode: 0600
+    owner: dovecot
+    group: mail
+  with_items:
+    - ca.pem
+    - cert.pem
+    - key.pem
+
+- name: Ensure dovecot is enabled and running
+  service:
+    name: dovecot
+    state: restarted
+    enabled: yes

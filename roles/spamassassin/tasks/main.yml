@@ -1,0 +1,28 @@
+---
+- name: Install spamassassin packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - pyzor
+    - razor
+    - sa-compile
+    - spamassassin
+    - spamc
+
+- name: Configure spamassassin, razor and pyzor
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/spamassassin/{{ item }}"
+    mode: 0644
+  with_items:
+    - local.cf
+    - iXhash.cf
+    - iXhash.pm
+    - razor-agent.conf
+
+- name: Add logrotate job for razor-agent.log
+  template:
+    src: logrotate_razor.j2
+    dest: /etc/logrotate.d/razor
+    mode: 0644

@@ -1,0 +1,47 @@
+---
+- name: Install postfix packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - postfix
+    - postfix-pcre
+
+- name: Configure postfix
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/postfix/{{ item }}"
+    mode: 0644
+    owner: root
+    group: postfix
+  with_items:
+    - main.cf
+    - master.cf
+    - blackwhite.map
+    - valias.map
+    - virtual.map
+    - header_checks
+    - body_checks
+
+- name: Configure smtpd sasl
+  template:
+    src: smtpd.conf.j2
+    dest: /etc/postfix/sasl/smtpd.conf
+    mode: 0644
+    owner: root
+    group: postfix
+
+- name: Compile postfix maps
+  shell: "/usr/sbin/postmap {{ item }} 2>/dev/null"
+  args:
+    chdir: /etc/postfix
+  with_items:
+    - blackwhite.map
+    - valias.map
+    - virtual.map
+
+- name: Ensure postfix is started and enabled
+  service:
+    name: postfix
+    enabled: yes
+    state: restarted

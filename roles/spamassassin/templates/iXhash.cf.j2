@@ -1,0 +1,47 @@
+  loadplugin    Mail::SpamAssassin::Plugin::iXhash /etc/spamassassin/iXhash.pm
+# This makes DNS queries time out after 10 seconds (2x default)
+  ixhash_timeout    10
+
+# This list uses iX Magazine's spam as datasource.
+  body          IXHASH eval:ixhashtest('ix.dnsbl.manitu.net')
+  describe      IXHASH This mail has been classified as spam @ iX Magazine, Germany
+  tflags        IXHASH net
+  score         IXHASH 1.5
+
+# This list uses iX Magazine's spam as datasource.
+  body          IXHASH eval:ixhashtest('ix-dns01.dnsbl.manitu.net')
+  describe      IXHASH This mail has been classified as spam @ iX Magazine, Germany
+  tflags        IXHASH net
+  score         IXHASH 1.5
+
+# This list comes in @ spamtraps run by LogIn & Solutions AG, Germany
+# Manually verified stuff
+  body          LOGINHASH1 eval:ixhashtest('nospam.login-solutions.de')
+  describe      LOGINHASH1 mail has been classified as spam @ LogIn&Solutions AG, Germany
+  tflags        LOGINHASH1 net
+  score         LOGINHASH1 1.5
+
+# This list contains hashes from Mails classified as spam at a larger company based in Germany
+# Lots of stuff, but automatically categorized and contributed
+  body          LOGINHASH2 eval:ixhashtest('nospam.login-solutions.ag')
+  describe      LOGINHASH2 mail has been classified as spam @ unknown company, Germany
+  tflags        LOGINHASH2 net
+  score         LOGINHASH2 1.5
+
+  body          GENERIC_IXHASH eval:ixhashtest('generic.ixhash.net')
+  describe      GENERIC_IXHASH iXhash found @ generic.ixhash.net
+  tflags        GENERIC_IXHASH net
+  # adjust score as you seem fit
+  score         GENERIC_IXHASH 1.5
+
+  body          CTYME_IXHASH eval:ixhashtest('ctyme.ixhash.net')
+  describe      CTYME_IXHASH iXhash found @ ctyme.ixhash.ne
+  tflags        CTYME_IXHASH net
+  # adjust as you seem fit
+  score         CTYME_IXHASH 1.5
+
+  body          HOSTEUROPE_IXHASH eval:ixhashtest('hosteurope.ixhash.net')
+  describe      HOSTEUROPE_IXHASH iXhash found @ hosteurope.ixhash.ne
+  tflags        HOSTEUROPE_IXHASH net
+  # adjust as you seem fit
+  score         HOSTEUROPE_IXHASH 1.5
