@@ -4,6 +4,7 @@
     name: "{{ item }}"
     state: latest
   with_items:
+    - sudo
     - lvm2
     - xfsprogs
     - mlocate
@@ -15,6 +16,13 @@
     - lshw
     - curl
     - binutils
+    - unzip
+    - rsync
+    - strace
+
+- name: Set fqdn hostname
+  hostname:
+    name: "{{ mail_fqdn_hostname }}"
 
 - name: "sysctl - set swapiness"
   sysctl:

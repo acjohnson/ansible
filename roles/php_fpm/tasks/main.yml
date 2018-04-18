@@ -1,1 +1,31 @@
 ---
+- name: Install php-fpm packages
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - php7.0-cli
+    - php7.0-common
+    - php7.0-enchant
+    - php7.0-fpm
+    - php7.0-intl
+    - php7.0-json
+    - php7.0-mcrypt
+    - php7.0-readline
+    - php7.0-sqlite3
+    - php7.0-xml
+    - php7.0-gd
+    - php7.0-mbstring
+    - php7.0-zip
+
+- name: Configure php-fpm
+  template:
+    src: php.ini.j2
+    dest: /etc/php/7.0/fpm/php.ini
+    mode: 0644
+
+- name: Ensure php-fpm service is enabled and running
+  systemd:
+    name: php7.0-fpm
+    enabled: yes
+    state: restarted

@@ -1,9 +1,9 @@
 ---
-postfix_domain: pcdomain.com
+postfix_domain: example.com
 postfix_hostname: "mail.{{ postfix_domain }}"
 postfix_virtual_alias_domains: "qcfavorme.org, jasonsdistributing.com"
 
-postfix_ssl_dir: /etc/ssl
+postfix_ssl_dir: /etc/ssl/mail
 postfix_ssl_ca_file: "{{ postfix_ssl_dir }}/ca.pem"
 postfix_ssl_cert_file: "{{ postfix_ssl_dir }}/cert.pem"
 postfix_ssl_key_file: "{{ postfix_ssl_dir }}/key.pem"

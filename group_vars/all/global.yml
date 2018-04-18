@@ -1,0 +1,19 @@
+---
+mail_ssl_dir: /etc/ssl/mail
+mail_domain: pcdomain.com
+mail_fqdn_hostname: mail.pcdomain.com
+
+nginx_roundcube_server_port: 443
+nginx_roundcube_secondary_port: 8080
+
+dovecot_ssl_dir: "{{ mail_ssl_dir }}"
+postfix_ssl_dir: "{{ mail_ssl_dir }}"
+roundcube_ssl_dir: "{{ mail_ssl_dir }}"
+
+dovecot_domain: "{{ mail_domain }}"
+postfix_domain: "{{ mail_domain }}"
+roundcube_domain: "{{ mail_domain }}"
+
+denyhosts_branch: v2.9
+denyhosts_allowed_hosts:
+  - homeserv.kristyandaaron.com

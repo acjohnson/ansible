@@ -1,1 +1,78 @@
 ---
+- name: Install Roundcube dependencies
+  package:
+    name: sqlite3
+    state: latest
+
+- name: Ensure /var/www directory exists
+  file:
+    path: /var/www
+    state: directory
+    mode: 0755
+
+- name: "Download roundcube {{ roundcube_version }}"
+  get_url:
+    url: "{{ roundcube_url }}"
+    dest: /var/www
+    checksum: "{{ roundcube_checksum }}"
+    mode: 0644
+
+- name: Unarchive roundcube
+  unarchive:
+    src: "/var/www/{{ roundcube_archive }}"
+    dest: /var/www
+    owner: www-data
+    group: www-data
+
+- name: Create /var/www/roundcube symlink
+  file:
+    state: link
+    src: "/var/www/roundcubemail-{{ roundcube_version }}"
+    dest: /var/www/roundcube
+
+- name: Configure roundcube
+  template:
+    src: config.inc.php.j2
+    dest: "/var/www/roundcubemail-{{ roundcube_version }}/config/config.inc.php"
+    owner: www-data
+    group: www-data
+    mode: 0644
+
+- name: Create /var/sqlite3 directory
+  file:
+    state: directory
+    path: /var/sqlite3
+    mode: 0755
+    owner: root
+    group: root
+
+- name: "Create /var/sqlite3/roundcube-{{ roundcube_version }} directory"
+  file:
+    state: directory
+    path: "/var/sqlite3/roundcube-{{ roundcube_version }}"
+    mode: 0750
+    owner: www-data
+    group: www-data
+
+- name: Install roundcube plugins
+  unarchive:
+    src: "{{ item.url }}"
+    dest: "/var/www/roundcubemail-{{ roundcube_version }}/plugins"
+    remote_src: yes
+    owner: www-data
+    group: www-data
+  with_items: "{{ roundcube_plugins }}"
+
+- name: Copy extracted plugins to proper location...
+  synchronize:
+    src: "/var/www/roundcubemail-{{ roundcube_version }}/plugins/{{ item.extracted_folder }}/"
+    dest: "/var/www/roundcubemail-{{ roundcube_version }}/plugins/{{ item.destination_folder }}/"
+    archive: yes
+    delete: yes
+  with_items: "{{ roundcube_plugins }}"
+
+- name: Discard extracted plugin folders...
+  file:
+    path: "/var/www/roundcubemail-{{ roundcube_version }}/plugins/{{ item.extracted_folder }}"
+    state: absent
+  with_items: "{{ roundcube_plugins }}"

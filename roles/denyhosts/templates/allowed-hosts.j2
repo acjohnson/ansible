@@ -1,0 +1,9 @@
+127.0.0.1
+127.0.1.1
+{{ ansible_default_ipv4.address }}
+{{ ansible_fqdn }}
+{% if denyhosts_allowed_hosts is defined %}
+{% for host in denyhosts_allowed_hosts %}
+{{ host }}
+{% endfor %}
+{% endif %}

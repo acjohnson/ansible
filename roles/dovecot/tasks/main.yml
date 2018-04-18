@@ -23,19 +23,35 @@
     group: mail
     state: present
 
+- name: Ensure /etc/dovecot/sieve directory exists
+  file:
+    state: directory
+    path: /etc/dovecot/sieve
+    mode: 0755
+    owner: dovecot
+    group: root
+
 - name: Configure dovecot
   template:
-    src: dovecot.conf.j2
-    dest: /etc/dovecot/dovecot.conf
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: 0644
     owner: dovecot
-    group: mail
+    group: root
+  with_items:
+    - { src: "dovecot.conf.j2", dest: "/etc/dovecot/dovecot.conf" }
+    - { src: "global.sieve.j2", dest: "/etc/dovecot/sieve/global.sieve" }
 
-- name: Ensure dovecot.log exists
+- name: Compile dovecot global.sieve
+  shell: "/usr/bin/sievec {{ item }} 2>/dev/null"
+  with_items:
+    - /etc/dovecot/sieve/global.sieve
+
+- name: Ensure dovecot.log exists and that mail (gid 8) has access
   file:
     path: /var/log/dovecot.log
     state: touch
-    mode: 0644
+    mode: 0664
     owner: dovecot
     group: mail
 
@@ -49,21 +65,21 @@
   file:
     path: "{{ dovecot_ssl_dir }}"
     state: directory
-    mode: 0700
+    mode: 0755
     owner: dovecot
-    group: mail
+    group: root
 
 - name: Create SSL certificate files
   template:
-    src: "{{ item }}.j2"
-    dest: "{{ dovecot_ssl_dir }}/{{ item }}"
-    mode: 0600
+    src: "{{ item.filename }}.j2"
+    dest: "{{ dovecot_ssl_dir }}/{{ item.filename }}"
+    mode: "{{ item.mode }}"
     owner: dovecot
-    group: mail
+    group: root
   with_items:
-    - ca.pem
-    - cert.pem
-    - key.pem
+    - { filename: "ca.pem", mode: "0644" }
+    - { filename: "cert.pem", mode: "0644" }
+    - { filename: "key.pem", mode: "0400" }
 
 - name: Ensure dovecot is enabled and running
   service:

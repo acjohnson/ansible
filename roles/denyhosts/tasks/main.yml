@@ -1,1 +1,53 @@
 ---
+- name: Install python-pip package
+  apt:
+    name: python-pip
+    state: latest
+
+- name: Install python dependencies
+  pip:
+    name: "{{ item }}"
+    state: latest
+    executable: pip2
+  with_items:
+    - setuptools
+    - pip
+
+- name: "Install denyhosts from {{ denyhosts_branch }} branch/tag"
+  pip:
+    name: "git+ssh://git@github.com/denyhosts/denyhosts.git@{{ denyhosts_branch }}#egg=DenyHosts"
+    executable: pip2
+
+- name: Ensure /var/lib/denyhosts exists
+  file:
+    state: directory
+    path: /var/lib/denyhosts
+    mode: 0755
+
+- name: Configure denyhosts
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - { src: "denyhosts.conf-{{ denyhosts_branch }}.j2", dest: "/etc/denyhosts.conf" }
+    - { src: "allowed-hosts.j2", dest: "/var/lib/denyhosts/allowed-hosts" }
+    - { src: "restricted-usernames.j2", dest: "/var/lib/denyhosts/restricted-usernames" }
+
+- name: Add logrotate job for denyhosts.log
+  template:
+    src: logrotate_denyhosts.j2
+    dest: /etc/logrotate.d/denyhosts
+    mode: 0644
+
+- name: Create denyhosts systemd service
+  template:
+    src: denyhosts.service.j2
+    dest: /etc/systemd/system/denyhosts.service
+    mode: 0644
+
+- name: Ensure denyhosts is enabled and running
+  service:
+    name: denyhosts
+    enabled: yes
+    state: restarted

@@ -1,1 +1,3 @@
 ---
+denyhosts_branch: master
+denyhosts_allowed_hosts: []

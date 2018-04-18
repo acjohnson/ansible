@@ -21,8 +21,48 @@
     - iXhash.pm
     - razor-agent.conf
 
-- name: Add logrotate job for razor-agent.log
+- name: Add logrotate job for razor and pyzor
   template:
-    src: logrotate_razor.j2
-    dest: /etc/logrotate.d/razor
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: 0644
+  with_items:
+    - { src: "logrotate_razor.j2", dest: "/etc/logrotate.d/razor" }
+    - { src: "logrotate_pyzor.j2", dest: "/etc/logrotate.d/pyzor" }
+
+- name: Ensure spamassassin is enabled and running
+  service:
+    name: spamassassin
+    enabled: yes
+    state: restarted
+
+- name: Enable and register razor plugin
+  shell: |
+    /usr/bin/razor-admin -create
+    /usr/bin/razor-admin -register
+    /usr/bin/razor-admin -discover
+  args:
+    creates: /var/lib/spamassassin/.razor/identity
+  register: shell_result
+  become: yes
+  become_user: debian-spamd
+
+- name: Results
+  debug:
+    var: shell_result.stdout_lines
+
+- name: Setup learn_spam and report_spam
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0755
+  with_items:
+    - { src: "learn_spam.sh", dest: "/opt/learn_spam.sh" }
+    - { src: "report_spam.pl", dest: "/opt/report_spam.pl" }
+
+- name: Enable learn_spam and report_spam cron
+  cron:
+    name: "learn_spam and report_spam"
+    minute: 30
+    hour: 2
+    job: "/opt/learn_spam.sh 2>&1 > /dev/null"

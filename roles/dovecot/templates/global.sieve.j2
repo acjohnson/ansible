@@ -1,0 +1,6 @@
+require ["fileinto", "copy"];
+# Move spam to spambox
+if header :contains "X-Spam-Flag" "YES" {
+  fileinto "Spam";
+  stop;
+}
