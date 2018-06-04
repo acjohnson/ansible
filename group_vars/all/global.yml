@@ -1,7 +1,9 @@
 ---
+
+fqdn_hostname: ""
+
 mail_ssl_dir: /etc/ssl/mail
 mail_domain: pcdomain.com
-mail_fqdn_hostname: mail.pcdomain.com
 
 nginx_roundcube_server_port: 443
 nginx_roundcube_secondary_port: 8080

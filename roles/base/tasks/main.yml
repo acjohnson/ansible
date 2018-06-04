@@ -22,7 +22,7 @@
 
 - name: Set fqdn hostname
   hostname:
-    name: "{{ mail_fqdn_hostname }}"
+    name: "{{ fqdn_hostname }}"
 
 - name: "sysctl - set swapiness"
   sysctl:
