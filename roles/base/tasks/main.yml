@@ -19,6 +19,7 @@
     - unzip
     - rsync
     - strace
+    - tmux
 
 - name: Set fqdn hostname
   hostname:
