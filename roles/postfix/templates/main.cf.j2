@@ -135,3 +135,9 @@ smtpd_hard_error_limit = 10
 
 # Disable postfix backwards compatibility
 compatibility_level = 2
+
+# opendkim configuration
+milter_default_action = accept
+milter_protocol = 2
+smtpd_milters = unix:var/run/opendkim/opendkim.sock
+non_smtpd_milters = unix:var/run/opendkim/opendkim.sock

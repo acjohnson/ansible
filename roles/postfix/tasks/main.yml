@@ -7,6 +7,25 @@
     - postfix
     - postfix-pcre
 
+- name: Ensure /etc/postfix/dkim directory exists
+  file:
+    path: /etc/postfix/dkim
+    state: directory
+    owner: root
+    group: opendkim
+    mode: 0755
+
+- name: "Generate DKIM key for {{ postfix_domain }}"
+  shell: "opendkim-genkey -D /etc/postfix/dkim/ -d {{ postfix_domain }} -s mail"
+
+- name: Recursively set permissions on /etc/postfix/dkim
+  file:
+    dest: /etc/postfix/dkim
+    owner: root
+    group: opendkim
+    mode: 0755
+    recurse: yes
+
 - name: Configure postfix
   template:
     src: "{{ item }}.j2"

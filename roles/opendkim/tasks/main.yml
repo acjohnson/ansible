@@ -1,0 +1,5 @@
+---
+- name: Install opendkim packages
+  package:
+    name: "{{ opendkim_packages }}"
+    state: latest
