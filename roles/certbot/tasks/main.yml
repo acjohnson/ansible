@@ -1,0 +1,78 @@
+---
+
+- name: Install Dependencies
+  apt:
+    name:
+      - git
+      - curl
+      - wget
+      - openssl
+      - ca-certificates
+      - build-essential
+      - libffi-dev
+      - libssl-dev
+      - python-dev
+      - python-setuptools
+    state: present
+    update_cache: yes
+
+- name: Install pip using easy_install
+  easy_install:
+    name: pip
+    state: present
+
+- name: Update setuptools to latest
+  pip:
+    name: setuptools
+    state: latest
+
+- name: Create certbot user
+  user:
+    name: certbot
+    state: present
+    create_home: yes
+    home: /opt/certbot
+    shell: /bin/bash
+    groups: haproxy
+    append: yes
+
+- name: Add haproxy user to certbot group
+  user:
+    name: haproxy
+    groups: certbot
+    append: yes
+
+- name: Create /opt/certbot directory structure
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: certbot
+    group: certbot
+  with_items:
+    - /opt/certbot/logs
+    - /opt/certbot/config
+    - /opt/certbot/.config/letsencrypt
+
+- name: Configure certbot
+  template:
+    src: cli.ini.j2
+    dest: /opt/certbot/.config/letsencrypt/cli.ini
+
+- name: Configure certbot sudo rules
+  lineinfile:
+    path: /etc/sudoers.d/99-certbot
+    line: '%certbot ALL=NOPASSWD: /bin/systemctl restart haproxy'
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: Clone greenhost/certbot-haproxy git repo
+  git:
+    repo: https://code.greenhost.net/open/certbot-haproxy.git
+    dest: /root/certbot-haproxy
+
+- name: Install greenhost/certbot-haproxy
+  pip:
+    name: file:///root/certbot-haproxy
+    state: present

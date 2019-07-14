@@ -1,0 +1,32 @@
+---
+
+- name: Install Debian HAProxy Repo GPG Key
+  apt_key:
+    url: https://haproxy.debian.net/bernat.debian.org.gpg
+    state: present
+
+- name: Add Debian HAProxy Repo
+  apt_repository:
+    repo: deb http://haproxy.debian.net stretch-backports-2.0 main
+    state: present
+    filename: haproxy
+
+- name: Install HAProxy
+  apt:
+    name: 'haproxy=2.0.*'
+    state: present
+    update_cache: yes
+
+- name: Configure HAProxy
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: haproxy
+    group: haproxy
+    mode: 0660
+
+- name: Reload and Enable HAProxy service
+  service:
+    name: haproxy
+    enabled: yes
+    state: reloaded
