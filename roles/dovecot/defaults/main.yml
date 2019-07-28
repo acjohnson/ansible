@@ -5,3 +5,5 @@ dovecot_ssl_dir: /etc/ssl/mail
 dovecot_ssl_ca_file: "{{ dovecot_ssl_dir }}/ca.pem"
 dovecot_ssl_cert_file: "{{ dovecot_ssl_dir }}/cert.pem"
 dovecot_ssl_key_file: "{{ dovecot_ssl_dir }}/key.pem"
+
+sieve_spam_subjects: '["badwords", "thatyouwanttoblock"]'

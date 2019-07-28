@@ -4,3 +4,7 @@ if header :contains "X-Spam-Flag" "YES" {
   fileinto "Spam";
   stop;
 }
+if header :contains "subject" {{ sieve_spam_subjects }} {
+  fileinto "Spam";
+  stop;
+}
