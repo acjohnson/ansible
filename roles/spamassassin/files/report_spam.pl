@@ -1,8 +1,7 @@
 #!/usr/bin/perl -w
-{{{
-#created by Kurt Yoder; see 
+#created by Kurt Yoder; see
 #http://wiki.spamassassin.org/w/KurtYoder
-#for updates on this script see 
+#for updates on this script see
 #http://wiki.spamassassin.org/w/report_5fspam_2epl
 #
 #If you have "maildir" mailboxes, running spamassassin -r multiple
@@ -15,6 +14,8 @@ use strict;
 use diagnostics;
 
 my $spamassassin = '/usr/bin/spamassassin';
+my $sa_learn = '/usr/bin/sa-learn';
+
 if( ! -x $spamassassin ){
    die( "Spamassassin not found; I looked in $spamassassin\n" );
 }
@@ -37,6 +38,7 @@ if(
          $file =~ s/([=:])/\\$1/g;
          print( "reporting $file\n" );
          system( "$spamassassin -r < $path$file" );
+         system( "$sa_learn --spam --no-sync $path" );
       } else {
          print( "Ignoring un-readable file $file\n" );
       }
@@ -44,4 +46,5 @@ if(
 } else {
    print( "Spam directory is empty or does not exist.\n" );
 }
-}}}
+print( "rebuilding spamassassin database...\n" );
+system( "$sa_learn --sync" );

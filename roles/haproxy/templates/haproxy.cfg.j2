@@ -55,7 +55,7 @@ frontend http-https-in
   rspadd Strict-Transport-Security:\ max-age=31536000;\ includeSubDomains;\ preload
   rspadd X-Frame-Options:\ DENY
 
-  acl host_mail hdr(host) -i pcdomain.com -i mail.pcdomain.com -i www.pcdomain.com
+  acl host_mail hdr(host) -i pcdomain.com
 
   use_backend certbot if is_certbot
   use_backend mail-cluster if host_mail
