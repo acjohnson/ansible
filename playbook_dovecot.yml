@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  gather_facts: no
   roles:
      # Note: dovecot will fail to run until the postfix role has been ran due to the following dependency:
      # Fatal: service(auth) User doesn't exist: postfix (See service auth { unix_listener /var/spool/postfix/private/auth { user } } setting)

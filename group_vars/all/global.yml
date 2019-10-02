@@ -2,8 +2,12 @@
 
 fqdn_hostname: ""
 
-mail_ssl_dir: /etc/ssl/mail
+mail_ssl_dir: /opt/certbot/haproxy_fullchains
 mail_domain: pcdomain.com
+
+postfix_ssl_ca_file: "{{ mail_ssl_dir }}/pcdomain.com.pem"
+postfix_ssl_cert_file: "{{ mail_ssl_dir }}/pcdomain.com.pem"
+postfix_ssl_key_file: "{{ mail_ssl_dir }}/pcdomain.com.pem"
 
 nginx_roundcube_server_port: 443
 nginx_roundcube_secondary_port: 8080
