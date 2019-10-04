@@ -1,0 +1,38 @@
+---
+- name: Install ffmpeg
+  package:
+    name: ffmpeg
+    state: latest
+
+- name: "Recursively find {{ find_base }} files larger than {{ min_file_size }}"
+  find:
+    paths: "{{ find_base }}"
+    size: "{{ min_file_size }}"
+    patterns: "*.{{ files_list_item }}"
+    excludes: "*_RECODE.mp4"
+    recurse: yes
+  register: files_list
+  loop_control:
+    loop_var: files_list_item
+  with_items:
+   - mp4
+   - mpeg4
+   - mkv
+   - avi
+
+- name: "Encoding..."
+  shell: |
+    ffmpeg -y -i "${SOURCE}" \
+    -threads "{{ ffmpeg_threads }}" \
+    -vcodec "{{ ffmpeg_vcodec }}" \
+    -b:v "{{ ffmpeg_vbitrate }}" \
+    -filter:v "{{ ffmpeg_vfilter }}" \
+    -acodec "{{ ffmpeg_acodec }}" \
+    -ab "{{ ffmpeg_abitrate }}" \
+    "${SOURCE%.{{ item[0].files_list_item }}}_RECODE.mp4"
+    rm -f "${SOURCE}"
+  environment:
+    SOURCE: "{{ item[1].path }}"
+  with_subelements:
+    - "{{ files_list.results }}"
+    - files

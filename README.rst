@@ -14,13 +14,25 @@ Table of Contents
 Description
 ***********
 
-Simple ansible roles and playbooks I created to migrate my email server from Debian 8 -> 9
+Simple ansible roles and playbooks I've created for various personal projects
 
 Requirements
 ============
 
 Usage
 *****
+
+ffmpeg media video optimizer
+============================
+Run the ``playbook_ffmpeg.yml`` playbook to scan a directory of video files (eg. Movies or TV Shows)
+and then have it automatically transcode the file to a smaller more stream friendly format (I use emby-server but could be useful for Plex as well)
+
+.. code-block:: bash
+
+  # ansible-playbook -i localhost, playbook_ffmpeg.yml
+
+DIY Email server
+================
 
 You can use the ``playbook_mailserver.yml`` playbook to configure an all-in-one
 email server with the following components:

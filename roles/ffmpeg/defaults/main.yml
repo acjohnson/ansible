@@ -1,0 +1,9 @@
+---
+find_base: "/mnt"
+min_file_size: "900m"
+ffmpeg_threads: 2
+ffmpeg_vcodec: "h264"
+ffmpeg_vbitrate: "1200k"
+ffmpeg_vfilter: "yadif"
+ffmpeg_acodec: "aac"
+ffmpeg_abitrate: "128k"
