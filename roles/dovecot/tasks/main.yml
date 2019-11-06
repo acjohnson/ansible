@@ -68,6 +68,7 @@
     mode: 0755
     owner: dovecot
     group: root
+  when: manage_mail_certs | bool == true
 
 - name: Create SSL certificate files
   template:
@@ -80,6 +81,7 @@
     - { filename: "ca.pem", mode: "0644" }
     - { filename: "cert.pem", mode: "0644" }
     - { filename: "key.pem", mode: "0400" }
+  when: manage_mail_certs | bool == true
 
 - name: Ensure dovecot is enabled and running
   service:

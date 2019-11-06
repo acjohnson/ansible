@@ -112,10 +112,9 @@ $config['default_port'] = 993;
 // http://www.roundcubeforum.net/index.php?topic=22035.0
 $config['imap_conn_options'] = array(
     'ssl' => array(
-      'verify_peer'       => true,
+      'verify_peer'       => false,
       'allow_self_signed' => true,
       'peer_name'         => 'mail.pcdomain.com',
-      'cafile'            => '{{ roundcube_imap_ssl_ca_file }}',
     ),
 );
 
