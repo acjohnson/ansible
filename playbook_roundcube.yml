@@ -1,4 +1,9 @@
 ---
 - hosts: all
   roles:
-     - roundcube
+    - roundcube
+  post_tasks:
+    - name:
+      service:
+        name: php7.0-fpm
+        state: restarted

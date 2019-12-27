@@ -1,10 +1,10 @@
 ---
 roundcube_domain: example.com
-roundcube_version: 1.3.10
+roundcube_version: 1.4.1
 roundcube_des_key: mustbe24charsinlength...
 roundcube_archive: "roundcubemail-{{ roundcube_version }}-complete.tar.gz"
 roundcube_url: "https://github.com/roundcube/roundcubemail/releases/download/{{ roundcube_version }}/{{ roundcube_archive }}"
-roundcube_checksum: sha256:69fe11550a0f5711020ecd55c6ad36394580800a68d43bb69ecedc91f36ba8bf
+roundcube_checksum: sha256:640423d21e1aa733ddea7462f156e194b051f086a3f2a70430e0aa2c9b09b44a
 roundcube_db_string: "sqlite:////var/sqlite3/roundcube-{{ roundcube_version }}/sqlite.db?mode=0640"
 roundcube_plugins:
   - filters:
