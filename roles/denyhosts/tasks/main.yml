@@ -6,12 +6,12 @@
 
 - name: Install python dependencies
   pip:
-    name: "{{ item }}"
+    name:
+      - setuptools
+      - pip
+      - ipaddr
     state: latest
     executable: pip2
-  with_items:
-    - setuptools
-    - pip
 
 - name: "Install denyhosts from {{ denyhosts_branch }} branch/tag"
   pip:
