@@ -1,3 +1,5 @@
 ---
-denyhosts_branch: master
+denyhosts_branch: bugfix
 denyhosts_allowed_hosts: []
+denyhosts_orgname: acjohnson
+denyhosts_reponame: denyhosts

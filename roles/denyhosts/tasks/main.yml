@@ -15,7 +15,7 @@
 
 - name: "Install denyhosts from {{ denyhosts_branch }} branch/tag"
   pip:
-    name: "git+ssh://git@github.com/denyhosts/denyhosts.git@{{ denyhosts_branch }}#egg=DenyHosts"
+    name: "git+ssh://git@github.com/{{ denyhosts_orgname }}/{{ denyhosts_reponame }}.git@{{ denyhosts_branch }}#egg=DenyHosts"
     executable: pip2
 
 - name: Ensure /var/lib/denyhosts exists
