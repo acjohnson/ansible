@@ -46,6 +46,10 @@
     dest: /etc/systemd/system/denyhosts.service
     mode: 0644
 
+- name: Issue systemctl daemon-reload in case unit file changed
+  systemd:
+    daemon_reload: yes
+
 - name: Ensure denyhosts is enabled and running
   service:
     name: denyhosts
