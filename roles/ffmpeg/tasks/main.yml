@@ -20,6 +20,13 @@
    - mkv
    - avi
 
+- name: "List of files to be encoded..."
+  debug:
+    msg: "{{ item[1].path }}"
+  with_subelements:
+    - "{{ files_list.results }}"
+    - files
+
 - name: "Encoding..."
   shell: |
     ffmpeg -y -i "${SOURCE}" \
@@ -36,3 +43,5 @@
   with_subelements:
     - "{{ files_list.results }}"
     - files
+  tags:
+   - do_encode
