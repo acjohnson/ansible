@@ -23,3 +23,4 @@ roundcube_domain: "{{ mail_domain }}"
 denyhosts_branch: bugfix
 denyhosts_allowed_hosts:
   - homeserv.kristyandaaron.com
+  - emby.thejohnsons.site
