@@ -23,3 +23,6 @@ roundcube_domain: "{{ mail_domain }}"
 denyhosts_allowed_hosts:
   - homeserv.kristyandaaron.com
   - emby.thejohnsons.site
+  - mail.pcdomain.com
+  - 195.201.96.41
+  - 216.201.72.28
