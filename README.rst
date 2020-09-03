@@ -19,6 +19,25 @@ Simple ansible roles and playbooks I've created for various personal projects
 Requirements
 ============
 
+Create a virtualenv, you could use something like ``pyenv`` if you'd prefer
+
+.. code-block:: bash
+
+  # virtualenv -p $(which python3) venv
+  # source venv/bin/activate
+
+Install ansible
+
+.. code-block:: bash
+
+  # pip install ansible
+
+Install dependent roles
+
+.. code-block:: bash
+
+  # ansible-galaxy install -r requirements.yml -p ./roles
+
 Usage
 *****
 
