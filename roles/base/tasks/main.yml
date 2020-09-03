@@ -20,24 +20,25 @@
     - rsync
     - strace
     - tmux
+    - procps
+    - psmisc
 
 - name: Set fqdn hostname
   hostname:
     name: "{{ fqdn_hostname }}"
 
-- name: "sysctl - set swapiness"
+- name: "sysctl - Set swapiness to 0"
   sysctl:
     name: vm.swappiness
-    value: 5
+    value: 0
     state: present
 
-- name: "sysctl - disable IPv6"
+- name: "sysctl - Disable IPv6"
   sysctl:
-    name: "{{ item }}"
+    name: "net.ipv6.conf.{{ item }}.disable_ipv6"
     value: 1
     sysctl_set: yes
   with_items:
-    - net.ipv6.conf.all.disable_ipv6
-    - net.ipv6.conf.default.disable_ipv6
-    - net.ipv6.conf.lo.disable_ipv6
-    - net.ipv6.conf.eth0.disable_ipv6
+    - all
+    - default
+    - "{{ ansible_interfaces }}"
