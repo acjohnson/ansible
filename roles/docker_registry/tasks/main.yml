@@ -20,10 +20,11 @@
       name: python3-pip
       state: present
 
-  - name: Install docker-py.
+  - name: Install Docker SDK for Python
     pip:
-      name: docker-py
+      name: docker
       state: present
+      executable: pip3
 
   - name: Run docker role only on new clusters or if force_update is defined
     include_role:
