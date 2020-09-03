@@ -1,0 +1,12 @@
+---
+- name: Include playbook_base.yml
+  import_playbook: playbook_base.yml
+  when: force_update is defined
+
+- name: Setup docker registry node
+  hosts: all
+  vars:
+    ansible_python_interpreter: auto_silent
+
+  roles:
+    - docker_registry

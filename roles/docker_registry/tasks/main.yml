@@ -1,0 +1,77 @@
+---
+- block:
+
+  - name: Gather package facts
+    package_facts:
+      manager: auto
+
+  - name: Check if docker-ce package is installed
+    debug:
+      msg: "{{ ansible_facts.packages['docker-ce'] | length }} version(s) of docker-ce are installed!"
+    when: "'docker-ce' in ansible_facts.packages"
+
+  - name: Set skip_docker variable
+    set_fact:
+      skip_docker: True
+    when: "'docker-ce' in ansible_facts.packages"
+
+  - name: Install pip.
+    package:
+      name: python3-pip
+      state: present
+
+  - name: Install docker-py.
+    pip:
+      name: docker-py
+      state: present
+
+  - name: Run docker role only on new clusters or if force_update is defined
+    include_role:
+      name: docker
+    when: (force_update is defined) or (skip_docker is undefined)
+
+  - name: Create br-local network
+    docker_network:
+      name: br-local
+
+  become: yes
+
+- name: Configure docker_registry container
+  include_role:
+    name: configure_container
+  vars:
+    custom_tasks: True
+    container_type: docker_registry
+    container_name: "{{ docker_registry_config_item.container_name }}"
+    configure_container: False
+    config_filename: "{{ docker_registry_container_globals.config_filename }}"
+  with_items:
+    - "{{ docker_registry_containers }}"
+  loop_control:
+    loop_var: docker_registry_config_item
+
+- name: Create docker_registry container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ docker_registry_container_globals.registry_server }}"
+    registry_project: "{{ docker_registry_container_globals.registry_project }}"
+    image_name: "{{ docker_registry_container_globals.image_name }}"
+    image_tag: "{{ docker_registry_container_globals.image_tag }}"
+    container_name: "{{ docker_registry_item.container_name }}"
+    container_command: "{{ docker_registry_container_globals.container_command }}"
+    container_volumes: "{{ docker_registry_item.container_volumes }}"
+    container_exposed_ports: "{{ docker_registry_item.container_exposed_ports }}"
+    container_published_ports: "{{ docker_registry_item.container_published_ports }}"
+    container_networks: "{{ docker_registry_item.container_networks }}"
+  with_items:
+    - "{{ docker_registry_containers }}"
+  loop_control:
+    loop_var: docker_registry_item
+
+- name: "Disable Docker repo to avoid unexpected patching - [Debian]"
+  apt_repository:
+    repo: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+    state: absent
+  become: yes
+  when: ansible_facts['os_family'] == "Debian"

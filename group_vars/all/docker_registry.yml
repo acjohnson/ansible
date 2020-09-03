@@ -1,0 +1,20 @@
+---
+docker_registry_container_globals:
+  registry_server: docker.io
+  registry_project: library
+  image_name: registry
+  image_tag: latest
+  container_command: '/etc/docker/registry/config.yml'
+  config_filename: config.yml
+
+docker_registry_containers:
+  - container_name: registry
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 5000
+    container_published_ports:
+      - 5000:5000
+    container_volumes:
+      - /docker/registry/data:/var/lib/registry
+      - /docker/registry/etc/config.yml:/etc/docker/registry/config.yml

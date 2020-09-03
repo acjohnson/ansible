@@ -1,0 +1,27 @@
+---
+- block:
+
+  - name: "Create nested {{ container_name }} directories"
+    file:
+      path: "{{ item.path }}"
+      mode: 0755
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      state: directory
+    with_items:
+      - { path: "/docker/{{ container_name }}/data" }
+      - { path: "/docker/{{ container_name }}/etc" }
+
+  - name: "Create nested {{ container_name }} files"
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      mode: 0644
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+    register: container_config
+    with_items:
+      - { src: "docker_registry_config.yml.j2", dest: "/docker/{{ container_name }}/etc/config.yml" }
+
+  become: yes
+  become_user: root
