@@ -1,0 +1,11 @@
+---
+container_name: hello-world
+config_filename: example.conf
+container_type: foo
+configure_container: True
+custom_tasks: False
+config_dest_dir: "/docker/{{ container_name }}"
+config_dest: "{{ config_dest_dir }}/{{ config_filename }}"
+
+owner_user: 999
+owner_group: 999

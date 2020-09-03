@@ -1,0 +1,34 @@
+---
+# TODO: Change modes to 0750 and 0640 respecivly once this docker/moby bug is resolved...
+# https://github.com/moby/moby/issues/7198
+
+- block:
+
+  - name: Include Custom Tasks
+    include_tasks: "{{ container_type }}_tasks.yml"
+    when: custom_tasks
+
+  - name: "Create {{ container_name }} config directory"
+    file:
+      path: "{{ config_dest_dir }}"
+      state: directory
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      mode: 0755
+
+  - name: "Configure {{ container_name }} with {{ config_filename }}"
+    template:
+      src: "{{ config_filename }}.j2"
+      dest: "{{ config_dest }}"
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      mode: 0644
+    register: container_config
+    when: configure_container
+
+  - name: Add changed status to dictionary
+    set_fact:
+      changed_status_dict: "{{ (changed_status_dict | combine({ container_name:container_config.changed })) if changed_status_dict is defined else { container_name:container_config.changed } }}"
+
+  become: yes
+  become_user: root

@@ -1,0 +1,25 @@
+---
+registry_server: docker.io
+registry_project: library
+
+image_name: hello-world
+image_tag: latest
+
+image_uri: "{{ registry_server }}/{{ registry_project }}/{{ image_name }}:{{ image_tag }}"
+image_uri_no_tag: "{{ registry_server }}/{{ registry_project }}/{{ image_name }}"
+
+container_name: hello-world
+container_state: started
+container_recreate: no
+container_command: ''
+container_env: {}
+container_exposed_ports: []
+container_published_ports: []
+container_volumes: []
+container_sysctls: {}
+container_tmpfs: []
+container_capabilities: []
+container_networks: []
+container_memory: ''
+container_restart_policy: unless-stopped
+container_networks_cli_compatible: yes

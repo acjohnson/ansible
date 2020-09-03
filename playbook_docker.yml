@@ -1,0 +1,49 @@
+---
+- hosts: all
+  vars:
+    docker_apt_arch: amd64
+    docker_apt_release_channel: stable
+
+  tasks:
+    - block:
+
+      - name: Gather package facts
+        package_facts:
+          manager: auto
+
+      - name: Check if docker-ce package is installed
+        debug:
+          msg: "{{ ansible_facts.packages['docker-ce'] | length }} version(s) of docker-ce are installed!"
+        when: "'docker-ce' in ansible_facts.packages"
+
+      - name: Set skip_docker variable
+        set_fact:
+          skip_docker: True
+        when: "'docker-ce' in ansible_facts.packages"
+
+      - name: Run docker role only on new clusters or if force_docker_update is defined
+        include_role:
+          name: docker
+        when: (force_docker_update is defined) or (skip_docker is undefined)
+
+      become: yes
+
+  post_tasks:
+    - name: "Disable Docker repo to avoid unexpected patching - [RedHat]"
+      yum_repository:
+        name: docker-ce-stable
+        file: docker-ce
+        description: Docker CE Stable - $basearch
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        gpgkey: https://download.docker.com/linux/centos/gpg
+        gpgcheck: yes
+        enabled: no
+      become: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: "Disable Docker repo to avoid unexpected patching - [Debian]"
+      apt_repository:
+        repo: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+        state: absent
+      become: yes
+      when: ansible_facts['os_family'] == "Debian"

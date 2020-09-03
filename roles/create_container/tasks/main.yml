@@ -1,0 +1,37 @@
+---
+- name: "Pull {{ image_name }}:{{ image_tag }} image from {{ image_uri_no_tag }}"
+  docker_image:
+    tag: "{{ image_tag }}"
+    name: "{{ image_uri_no_tag }}"
+    source: "pull"
+  become: true
+
+- name: Contents of changed_status_dict
+  debug:
+    msg: "{{ changed_status_dict }}"
+  when: changed_status_dict is defined
+
+- name: "Create/Start/Restart {{ image_uri }} container from image {{ image_name }}"
+  docker_container:
+    name: "{{ container_name }}"
+    networks_cli_compatible: "{{ container_networks_cli_compatible }}"
+    image: "{{ image_uri }}"
+    state: "{{ item }}"
+    recreate: "{{ container_recreate }}"
+    command: "{{ (container_command == '') | ternary(omit, container_command) }}"
+    env: "{{ (container_env == {}) | ternary(omit, container_env) }}"
+    exposed_ports: "{{ (container_exposed_ports == []) | ternary(omit, container_exposed_ports) }} | int"
+    published_ports: "{{ (container_published_ports == []) | ternary(omit, container_published_ports) }}"
+    volumes: "{{ (container_volumes == []) | ternary(omit, container_volumes) }}"
+    sysctls: "{{ (container_sysctls == {}) | ternary(omit, container_sysctls) }}"
+    tmpfs: "{{ (container_tmpfs == []) | ternary(omit, container_tmpfs) }}"
+    capabilities: "{{ (container_capabilities == []) | ternary(omit, container_capabilities) }}"
+    networks: "{{ (container_networks == []) | ternary(omit, container_networks) }}"
+    memory: "{{ (container_memory == '') | ternary(omit, container_memory) }}"
+    restart_policy: "{{ container_restart_policy }}"
+    interactive: yes
+    tty: yes
+  with_items:
+    - "{{ (changed_status_dict[container_name] | bool == true) | ternary('stopped', omit) if container_name in changed_status_dict else omit }}"
+    - "{{ container_state }}"
+  become: true
