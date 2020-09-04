@@ -1,0 +1,61 @@
+# Note: loadplugin should really go into local.pre or so
+loadplugin Mail::SpamAssassin::Plugin::iXhash2 /etc/spamassassin/iXhash2.pm
+
+ifplugin Mail::SpamAssassin::Plugin::iXhash2
+
+  ixhashdnsbl   IXHASH_IX  ix.dnsbl.manitu.net.
+  body          IXHASH_IX  eval:check_ixhash('IXHASH_IX')
+  describe      IXHASH_IX  http://www.ixhash.net/listinfo.html
+  tflags        IXHASH_IX  net
+  score         IXHASH_IX  1.5
+  reuse         IXHASH_IX
+
+# This list uses iX Magazine's spam as datasource.
+  ixhashdnsbl   IXHASH1 ix.dnsbl.manitu.net.
+  body          IXHASH1 eval:check_ixhash('IXHASH1')
+  describe      IXHASH1 This mail has been classified as spam @ iX Magazine, Germany
+  tflags        IXHASH1 net
+  score         IXHASH1 1.5
+
+# This list uses iX Magazine's spam as datasource.
+  ixhashdnsbl   IXHASH2 ix-dns01.dnsbl.manitu.net.
+  body          IXHASH2 eval:check_ixhash('IXHASH2')
+  describe      IXHASH2 This mail has been classified as spam @ iX Magazine, Germany
+  tflags        IXHASH2 net
+  score         IXHASH2 1.5
+
+# This list comes in @ spamtraps run by LogIn & Solutions AG, Germany
+# Manually verified stuff
+  ixhashdnsbl   LOGINHASH1 nospam.login-solutions.de
+  body          LOGINHASH1 eval:check_ixhash('LOGINHASH1')
+  describe      LOGINHASH1 mail has been classified as spam @ LogIn&Solutions AG, Germany
+  tflags        LOGINHASH1 net
+  score         LOGINHASH1 1.5
+
+# This list contains hashes from Mails classified as spam at a larger company based in Germany
+# Lots of stuff, but automatically categorized and contributed
+  ixhashdnsbl   LOGINHASH2 nospam.login-solutions.ag
+  body          LOGINHASH2 eval:check_ixhash('LOGINHASH2')
+  describe      LOGINHASH2 mail has been classified as spam @ unknown company, Germany
+  tflags        LOGINHASH2 net
+  score         LOGINHASH2 1.5
+
+  ixhashdnsbl   GENERIC_IXHASH generic.ixhash.net
+  body          GENERIC_IXHASH eval:check_ixhash('GENERIC_IXHASH')
+  describe      GENERIC_IXHASH iXhash found @ generic.ixhash.net
+  tflags        GENERIC_IXHASH net
+  score         GENERIC_IXHASH 1.5
+
+  ixhashdnsbl   CTYME_IXHASH ctyme.ixhash.net
+  body          CTYME_IXHASH eval:check_ixhash('CTYME_IXHASH')
+  describe      CTYME_IXHASH iXhash found @ ctyme.ixhash.ne
+  tflags        CTYME_IXHASH net
+  score         CTYME_IXHASH 1.5
+
+  ixhashdnsbl   HOSTEUROPE_IXHASH hosteurope.ixhash.net
+  body          HOSTEUROPE_IXHASH eval:check_ixhash('HOSTEUROPE_IXHASH')
+  describe      HOSTEUROPE_IXHASH iXhash found @ hosteurope.ixhash.ne
+  tflags        HOSTEUROPE_IXHASH net
+  score         HOSTEUROPE_IXHASH 1.5
+
+endif

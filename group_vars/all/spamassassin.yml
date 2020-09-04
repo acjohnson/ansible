@@ -1,0 +1,17 @@
+---
+spamassassin_container_globals:
+  registry_server: registry.thejohnsons.site
+  image_name: debianbased
+  image_tag: spamassassin
+  container_command: ''
+
+spamassassin_containers:
+  - container_name: spamassassin
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 783
+    container_published_ports:
+      - 127.0.0.1:783:783/tcp
+    container_volumes:
+      - /docker/spamassassin:/etc/spamassassin

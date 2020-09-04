@@ -1,0 +1,40 @@
+---
+- block:
+
+  - name: "Create nested {{ container_name }} directories"
+    file:
+      path: "{{ item.path }}"
+      mode: 0755
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      state: directory
+    with_items:
+      - { path: "/docker/{{ container_name }}/sa-update-hooks.d" }
+
+  - name: "Create {{ container_name }} files"
+    template:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      mode: 0644
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+    register: container_config
+    with_items:
+      - { src: "{{ container_name }}/local.cf.j2", dest: "/docker/{{ container_name }}/local.cf" }
+      - { src: "{{ container_name }}/65_debian.cf", dest: "/docker/{{ container_name }}/65_debian.cf" }
+      - { src: "{{ container_name }}/init.pre", dest: "/docker/{{ container_name }}/init.pre" }
+      - { src: "{{ container_name }}/iXhash2.cf.j2", dest: "/docker/{{ container_name }}/iXhash2.cf" }
+      - { src: "{{ container_name }}/iXhash2.pm", dest: "/docker/{{ container_name }}/iXhash2.pm" }
+      - { src: "{{ container_name }}/razor-agent.conf.j2", dest: "/docker/{{ container_name }}/razor-agent.conf" }
+      - { src: "{{ container_name }}/sa-compile.pre", dest: "/docker/{{ container_name }}/sa-compile.pre" }
+      - { src: "{{ container_name }}/v310.pre", dest: "/docker/{{ container_name }}/v310.pre" }
+      - { src: "{{ container_name }}/v312.pre", dest: "/docker/{{ container_name }}/v312.pre" }
+      - { src: "{{ container_name }}/v320.pre", dest: "/docker/{{ container_name }}/v320.pre" }
+      - { src: "{{ container_name }}/v330.pre", dest: "/docker/{{ container_name }}/v330.pre" }
+      - { src: "{{ container_name }}/v340.pre", dest: "/docker/{{ container_name }}/v340.pre" }
+      - { src: "{{ container_name }}/v341.pre", dest: "/docker/{{ container_name }}/v341.pre" }
+      - { src: "{{ container_name }}/v342.pre", dest: "/docker/{{ container_name }}/v342.pre" }
+      - { src: "{{ container_name }}/v343.pre", dest: "/docker/{{ container_name }}/v343.pre" }
+
+  become: yes
+  become_user: root

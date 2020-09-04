@@ -1,0 +1,23 @@
+---
+- block:
+  - name: Enable and register razor plugin
+    shell: |
+      docker exec -it spamassassin sudo -u debian-spamd /usr/bin/razor-admin -create
+      docker exec -it spamassassin sudo -u debian-spamd /usr/bin/razor-admin -register
+      docker exec -it spamassassin sudo -u debian-spamd /usr/bin/razor-admin -discover
+    register: shell_output
+
+  - name: Bootstrap command
+    debug:
+      msg: "{{ shell_output.cmd }}"
+
+  - name: Bootstrap command stdout
+    debug:
+      msg: "{{ shell_output.stdout_lines }}"
+
+  - name: Bootstrap command stderr
+    debug:
+      msg: "{{ shell_output.stderr }}"
+
+  become_user: root
+  become: yes

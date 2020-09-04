@@ -1,0 +1,3 @@
+---
+docker_apt_arch: amd64
+docker_apt_release_channel: stable
