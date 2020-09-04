@@ -201,7 +201,7 @@ sub compute1sthash
     my $body = shift;
 
     #  Creation of hash # 1 if following conditions are met:
-    # - mail contains 20 spaces or tabs or more - changed follwoing a suggestion by Karsten Br‰ckelmann
+    # - mail contains 20 spaces or tabs or more - changed follwoing a suggestion by Karsten Br√§ckelmann
     # - mail consists of at least 2 lines
     #  This should generate the most hits (according to Bert Ungerer about 70%)
     #  This also is where you can tweak your plugin if you have problems with short mails FP'ing -
@@ -220,7 +220,7 @@ sub compute1sthash
         # Do this in two steps to avoid Perl segfaults
         # if there are more than x identical chars to be replaced
         # Thanks to Martin Blapp for finding that out and suggesting this workaround concerning spaces only
-        # Thanks to Karsten Br‰ckelmann for pointing out this would also be the case with _any_ characater, not only spaces
+        # Thanks to Karsten Br√§ckelmann for pointing out this would also be the case with _any_ characater, not only spaces
         my $body_copy = $body;
         $body_copy =~ s/\r\n/\n/g;
         # Step One
