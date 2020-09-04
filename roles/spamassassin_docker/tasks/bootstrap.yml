@@ -19,5 +19,21 @@
     debug:
       msg: "{{ shell_output.stderr }}"
 
+  - name: Setup learn_spam and report_spam
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      mode: 0755
+    with_items:
+      - { src: "learn_spam.sh", dest: "/opt/learn_spam.sh" }
+      - { src: "report_spam.pl", dest: "/opt/report_spam.pl" }
+
+  - name: Enable learn_spam and report_spam cron
+    cron:
+      name: "learn_spam and report_spam"
+      minute: 30
+      hour: 2
+      job: "/opt/learn_spam.sh 2>&1 > /dev/null"
+
   become_user: root
   become: yes
