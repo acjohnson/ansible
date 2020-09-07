@@ -1,1 +1,38 @@
 ---
+php_packages:
+  stretch:
+    - php7.0-cli
+    - php7.0-common
+    - php7.0-enchant
+    - php7.0-fpm
+    - php7.0-intl
+    - php7.0-json
+    - php7.0-mcrypt
+    - php7.0-readline
+    - php7.0-sqlite3
+    - php7.0-xml
+    - php7.0-gd
+    - php7.0-mbstring
+    - php7.0-zip
+  buster:
+    - php-cli
+    - php-common
+    - php-enchant
+    - php-fpm
+    - php-intl
+    - php-json
+    - php-defuse-php-encryption
+    - php-readline
+    - php-sqlite3
+    - php-xml
+    - php-gd
+    - php-mbstring
+    - php-zip
+
+php_conf_dir:
+  stretch: "/etc/php/7.0/fpm"
+  buster: "/etc/php/7.3/fpm"
+
+php_service_name:
+  stretch: "php7.0-fpm"
+  buster: "php7.3-fpm"

@@ -7,6 +7,7 @@
 - name: Install python dependencies
   pip:
     name:
+      - requests
       - setuptools
       - pip
       - ipaddr
