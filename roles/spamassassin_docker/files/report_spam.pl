@@ -37,8 +37,8 @@ if(
          #shell-escape all '=' and ':'
          $file =~ s/([=:])/\\$1/g;
          print( "reporting $file\n" );
-         system( "docker exec -t spamassassin $spamassassin -r < $path$file" );
-         system( "docker exec -t spamassassin $sa_learn --spam --no-sync $path" );
+         system( "docker exec -i spamassassin $spamassassin -r < $path$file" );
+         system( "docker exec -i spamassassin $sa_learn --spam --no-sync $path" );
       } else {
          print( "Ignoring un-readable file $file\n" );
       }
@@ -47,4 +47,4 @@ if(
    print( "Spam directory is empty or does not exist.\n" );
 }
 print( "rebuilding spamassassin database...\n" );
-system( "docker exec -t spamassassin $sa_learn --sync" );
+system( "docker exec -i spamassassin $sa_learn --sync" );
