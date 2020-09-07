@@ -33,14 +33,6 @@
     create_home: yes
     home: /opt/certbot
     shell: /bin/bash
-    groups: haproxy
-    append: yes
-
-- name: Add haproxy user to certbot group
-  user:
-    name: haproxy
-    groups: certbot
-    append: yes
 
 - name: Create /opt/certbot directory structure
   file:
@@ -57,22 +49,3 @@
   template:
     src: cli.ini.j2
     dest: /opt/certbot/.config/letsencrypt/cli.ini
-
-- name: Configure certbot sudo rules
-  lineinfile:
-    path: /etc/sudoers.d/99-certbot
-    line: '%certbot ALL=NOPASSWD: /bin/systemctl restart haproxy'
-    state: present
-    mode: 0440
-    create: yes
-    validate: 'visudo -cf %s'
-
-- name: Clone greenhost/certbot-haproxy git repo
-  git:
-    repo: https://code.greenhost.net/open/certbot-haproxy.git
-    dest: /root/certbot-haproxy
-
-- name: Install greenhost/certbot-haproxy
-  pip:
-    name: file:///root/certbot-haproxy
-    state: present
