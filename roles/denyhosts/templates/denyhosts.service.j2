@@ -4,9 +4,9 @@ Before=sshd.service
 
 [Service]
 Type=forking
-ExecStartPre=/bin/rm -f /var/run/denyhosts.pid
+ExecStartPre=/bin/rm -f /run/denyhosts.pid
 ExecStart=/usr/local/bin/denyhosts.py --daemon --config=/etc/denyhosts.conf --debug
-PIDFile=/var/run/denyhosts.pid
+PIDFile=/run/denyhosts.pid
 TimeoutSec=1200
 
 [Install]
