@@ -1,6 +1,6 @@
 ---
 
-- name: Install Dependencies
+- name: Install python-certbot-nginx and deps
   apt:
     name:
       - git
@@ -13,18 +13,9 @@
       - libssl-dev
       - python-dev
       - python-setuptools
-    state: present
-    update_cache: yes
-
-- name: Install pip using easy_install
-  easy_install:
-    name: pip
-    state: present
-
-- name: Update setuptools to latest
-  pip:
-    name: setuptools
+      - python-certbot-nginx
     state: latest
+    update_cache: yes
 
 - name: Create certbot user
   user:
