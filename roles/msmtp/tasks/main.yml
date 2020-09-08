@@ -1,0 +1,16 @@
+---
+- name: Install msmtp
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - msmtp
+    - msmtp-mta
+
+- name: Create /etc/msmtprc
+  template:
+    src: msmtprc.j2
+    dest: /etc/msmtprc
+    mode: 0600
+    owner: root
+    group: root

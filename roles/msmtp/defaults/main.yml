@@ -1,0 +1,5 @@
+---
+msmtp_username: user
+msmtp_password: secret
+msmtp_host: "{{ fqdn_hostname }}"
+msmtp_from: hostname@example.com
