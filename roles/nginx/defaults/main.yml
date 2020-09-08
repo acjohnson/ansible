@@ -5,3 +5,5 @@ nginx_roundcube_server_port: 443
 nginx_roundcube_ssl_dir: /etc/ssl/www
 nginx_roundcube_ssl_cert_file: "{{ nginx_roundcube_ssl_dir }}/cert.pem"
 nginx_roundcube_ssl_key_file: "{{ nginx_roundcube_ssl_dir }}/key.pem"
+
+nginx_roundcube_secondary_port: ''
