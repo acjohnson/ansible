@@ -8,7 +8,7 @@ global
   user haproxy
   group haproxy
   daemon
-  ssl-default-bind-options no-sslv3 no-tlsv10
+  ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11
   ssl-default-bind-ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK
 
   ssl-server-verify none
@@ -42,27 +42,88 @@ defaults
   errorfile 503 /etc/haproxy/errors/503.http
   errorfile 504 /etc/haproxy/errors/504.http
 
+userlist basic-auth-list
+  group jackett
+  group docker_registry
+  user {{ jackett_user }} password {{ jackett_user_crypt }} groups jackett
+  user {{ docker_registry_user }} password {{ docker_registry_user_crypt }} groups docker_registry
+
 frontend http-https-in
   bind *:80
-  # Must keep these two lines commented until certbot has installed Let's Encrypt certs...
-  #bind *:443 ssl crt /opt/certbot/haproxy_fullchains/__fallback.pem crt /opt/certbot/haproxy_fullchains
-  #redirect scheme https code 301 if !{ ssl_fc }
+  bind *:443 ssl crt /opt/certbot/haproxy_fullchains/__fallback.pem crt /opt/certbot/haproxy_fullchains
 
   option forwardfor except 127.0.0.0/8
 
   # Forward Certbot verification requests to the certbot-haproxy plugin
   acl is_certbot path_beg -i /.well-known/acme-challenge
-  rspadd Strict-Transport-Security:\ max-age=31536000;\ includeSubDomains;\ preload
-  rspadd X-Frame-Options:\ DENY
+  #rspadd Strict-Transport-Security:\ max-age=31536000;\ includeSubDomains;\ preload
+  #rspadd X-Frame-Options:\ DENY
 
-  acl host_mail hdr(host) -i pcdomain.com
+  acl host_emby hdr(host) -i emby.thejohnsons.site
+  acl host_sonarr hdr(host) -i sonarr.thejohnsons.site
+  acl host_transmission hdr(host) -i transmission.thejohnsons.site
+  acl host_jackett hdr(host) -i jackett.thejohnsons.site
+  acl host_plex hdr(host) -i plex.thejohnsons.site
+  acl host_retrolanding hdr(host) -i retro.adrenlinerush.net
+  acl host_jellyfin hdr(host) -i jellyfin.thejohnsons.site
+  acl host_docker_registry hdr(host) -i registry.thejohnsons.site
+  acl host_roundcube hdr(host) -i pcdomain.com -i mail.pcdomain.com
 
   use_backend certbot if is_certbot
-  use_backend mail-cluster if host_mail
+  use_backend emby-cluster if host_emby
+  use_backend sonarr-cluster if host_sonarr
+  use_backend transmission-cluster if host_transmission
+  use_backend jackett-cluster if host_jackett
+  use_backend plex-cluster if host_plex
+  use_backend retrolanding-cluster if host_retrolanding
+  use_backend jellyfin-cluster if host_jellyfin
+  use_backend docker-registry-cluster if host_docker_registry
+  use_backend roundcube-cluster if host_roundcube
+
+  redirect scheme https code 301 if ! { ssl_fc } ! host_retrolanding
+  reqadd X-Forwarded-Proto:\ https if { ssl_fc } ! host_retrolanding
 
 backend certbot
   server certbot 127.0.0.1:8000
 
-backend mail-cluster
+backend emby-cluster
   balance roundrobin
-  server 127.0.0.1 127.0.0.1:443 check ssl
+  server 192.168.100.2 192.168.100.2:8096 check ssl
+
+backend roundcube-cluster
+  balance roundrobin
+  server 192.168.100.183 192.168.100.183:443 check ssl
+
+backend docker-registry-cluster
+  balance roundrobin
+  acl docker_registry_auth http_auth_group(basic-auth-list) docker_registry
+  http-request auth realm 192.168.100.141 unless docker_registry_auth
+  http-request set-header X-Forwarded-Proto https
+  server 192.168.100.141 192.168.100.141:5000 check
+
+backend jellyfin-cluster
+  balance roundrobin
+  server 192.168.100.240 192.168.100.240:8096 check ssl
+
+backend sonarr-cluster
+  balance roundrobin
+  server 192.168.100.111 192.168.100.111:8989 check
+
+backend transmission-cluster
+  balance roundrobin
+  server 192.168.100.214 192.168.100.214:9091 check
+
+backend jackett-cluster
+  balance roundrobin
+  acl jackett_auth http_auth_group(basic-auth-list) jackett
+  http-request auth realm 192.168.100.111 unless jackett_auth
+  http-request set-header X-Forwarded-Proto https
+  server 192.168.100.111 192.168.100.111:9117 check
+
+backend plex-cluster
+  balance roundrobin
+  server 192.168.100.135 192.168.100.135:32400 check ssl
+
+backend retrolanding-cluster
+  balance roundrobin
+  server 192.168.100.154 192.168.100.154:80 check
