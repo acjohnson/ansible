@@ -1,9 +1,13 @@
 ---
 - hosts: all
+  vars:
+    php_service_name:
+      stretch: "php7.0-fpm"
+      buster: "php7.3-fpm"
   roles:
     - roundcube
   post_tasks:
-    - name:
+    - name: Ensure php-fpm service is enabled and running
       service:
-        name: php7.0-fpm
+        name: "{{ php_service_name[ansible_distribution_release] }}"
         state: restarted
