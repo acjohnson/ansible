@@ -1,5 +1,7 @@
 ---
 roundcube_domain: example.com
+roundcube_smtp_fqdn: "{{ fqdn_hostname }}"
+roundcube_imap_fqdn: "{{ fqdn_hostname }}"
 roundcube_version: 1.4.8
 roundcube_des_key: mustbe24charsinlength...
 roundcube_archive: "roundcubemail-{{ roundcube_version }}-complete.tar.gz"

@@ -48,7 +48,7 @@ $config['default_host'] = 'ssl://localhost';
 // %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
 // %z - IMAP domain (IMAP hostname without the first part)
 // For example %n = mail.domain.tld, %t = domain.tld
-$config['smtp_server'] = 'localhost';
+$config['smtp_server'] = 'tls://{{ roundcube_smtp_fqdn }}';
 
 // SMTP port (default is 25; use 587 for STARTTLS or 465 for the
 // deprecated SSL over SMTP (aka SMTPS))
@@ -114,12 +114,12 @@ $config['imap_conn_options'] = array(
     'ssl' => array(
       'verify_peer'       => false,
       'allow_self_signed' => true,
-      'peer_name'         => 'mail.pcdomain.com',
+      'peer_name'         => '{{ roundcube_imap_fqdn }}',
     ),
 );
 
 // SMTP HELO host
-$config['smtp_helo_host'] = 'mail.pcdomain.com';
+$config['smtp_helo_host'] = '{{ roundcube_smtp_fqdn }}';
 // Automatically add this domain to user names for login
 $config['username_domain'] = '{{ roundcube_domain }}';
 // show up to X items in messages list view
