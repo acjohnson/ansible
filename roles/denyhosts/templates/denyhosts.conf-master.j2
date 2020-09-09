@@ -240,7 +240,12 @@ LOCK_FILE = /var/run/denyhosts.pid
 # /sbin/iptables
 # If this option is not set or commented out then the iptables
 # firewall is not used.
+#IPTABLES = /sbin/iptables
+{% if denyhosts_iptables_wrapper is defined %}
+IPTABLES = {{ denyhosts_iptables_wrapper }}
+{% else %}
 IPTABLES = /sbin/iptables
+{% endif %}
 #
 # Warning: If you are running IPTABLES, please make sure to comment
 # out the PFCTL_PATH and the PF_TABLE variables below. PF and

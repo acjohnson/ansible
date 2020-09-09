@@ -56,3 +56,10 @@
     name: denyhosts
     enabled: yes
     state: restarted
+
+- name: Create iptables wrapper script (optional)
+  template:
+    src: iptables-wrapper.sh.j2
+    dest: "{{ denyhosts_iptables_wrapper }}"
+    mode: 0755
+  when: denyhosts_iptables_wrapper is defined
