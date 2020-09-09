@@ -4,6 +4,7 @@ spamassassin_container_globals:
   image_name: debianbased
   image_tag: spamassassin
   container_command: ''
+  container_log_driver: "json-file"
   container_log_options:
     max-size: "10m"
     max-file: "1"

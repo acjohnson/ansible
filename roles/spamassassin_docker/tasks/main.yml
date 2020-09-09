@@ -66,6 +66,7 @@
     container_exposed_ports: "{{ spamassassin_item.container_exposed_ports }}"
     container_published_ports: "{{ spamassassin_item.container_published_ports }}"
     container_networks: "{{ spamassassin_item.container_networks }}"
+    container_log_driver: "{{ spamassassin_container_globals.container_log_driver }}"
     container_log_options: "{{ spamassassin_container_globals.container_log_options }}"
   with_items:
     - "{{ spamassassin_containers }}"
