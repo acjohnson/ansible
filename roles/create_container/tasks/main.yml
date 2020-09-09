@@ -28,6 +28,8 @@
     capabilities: "{{ (container_capabilities == []) | ternary(omit, container_capabilities) }}"
     networks: "{{ (container_networks == []) | ternary(omit, container_networks) }}"
     memory: "{{ (container_memory == '') | ternary(omit, container_memory) }}"
+    log_driver: "{{ (container_log_driver == '') | ternary(omit, container_log_driver) }}"
+    log_options: "{{ (container_log_options == {}) | ternary(omit, container_log_options) }}"
     restart_policy: "{{ container_restart_policy }}"
     interactive: yes
     tty: yes
