@@ -1,5 +1,22 @@
 ---
 - block:
+  - name: Ensure group debian-spamd exists
+    group:
+      name: debian-spamd
+      gid: 118
+      state: present
+
+  - name: Add debian-spamd user
+    user:
+      name: debian-spamd
+      uid: 111
+      group: debian-spamd
+      system: yes
+      state: present
+      home: /var/lib/spamassassin
+      create_home: no
+      shell: /usr/sbin/nologin
+
   - name: Enable and register razor plugin
     shell: |
       docker exec -it spamassassin sudo -u debian-spamd /usr/bin/razor-admin -create

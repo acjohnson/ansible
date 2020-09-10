@@ -5,7 +5,7 @@ auth_mechanisms = plain login
 # Remove domain name from username:
 auth_username_format = %Ln
 auth_default_realm = {{ dovecot_domain }}
-base_dir = /var/run/dovecot/
+base_dir = /var/run/dovecot
 first_valid_gid = 8
 first_valid_uid = 5000
 info_log_path = /var/log/dovecot.log
@@ -68,6 +68,20 @@ service imap-login {
 
 service imap {
   executable = /usr/lib/dovecot/imap
+}
+
+service stats {
+  unix_listener stats-writer {
+      user = dovecot
+      group = mail
+      mode = 0660
+  }
+
+  unix_listener stats-reader {
+      user = dovecot
+      group = mail
+      mode = 0660
+  }
 }
 
 ssl = required
