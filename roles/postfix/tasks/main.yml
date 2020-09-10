@@ -40,6 +40,18 @@
     - valias.map
     - virtual.map
 
+- name: Generate custom DH parameters file
+  shell: "openssl dhparam -out /etc/postfix/dh2048.pem 2048"
+  args:
+    creates: /etc/postfix/dh2048.pem
+
+- name: Set DH parameters file permissions
+  file:
+    path: '/etc/postfix/dh2048.pem'
+    owner: root
+    group: postfix 
+    mode: '0640'
+
 - name: Ensure postfix is started and enabled
   service:
     name: postfix
