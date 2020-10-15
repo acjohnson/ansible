@@ -25,3 +25,4 @@ denyhosts_allowed_hosts:
   - mail.pcdomain.com
   - 195.201.96.41
   - 216.201.72.28
+  - 216.201.72.47
