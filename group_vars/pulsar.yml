@@ -1,0 +1,153 @@
+---
+pulsar_cluster_name: pulsar
+
+pulsar_zookeeper_container_globals:
+  registry_server: docker.io
+  registry_project: apachepulsar
+  image_name: pulsar-all
+  image_tag: 2.6.1
+  config_filename: pulsar-zookeeper.conf
+  container_command: 'bin/pulsar zookeeper'
+  container_log_driver: json-file
+  container_log_options:
+    max-size: "100m"
+    max-file: "1"
+  pulsar_jvm_max_heap_memory: 2g
+  pulsar_jvm_max_direct_memory: 2g
+
+pulsar_bookkeeper_container_globals:
+  registry_server: docker.io
+  registry_project: apachepulsar
+  image_name: pulsar-all
+  image_tag: 2.6.1
+  config_filename: pulsar-bookkeeper.conf
+  container_command: 'bin/pulsar bookie'
+  container_log_driver: json-file
+  container_log_options:
+    max-size: "100m"
+    max-file: "1"
+  pulsar_jvm_max_heap_memory: 3g
+  pulsar_jvm_max_direct_memory: 3g
+
+pulsar_broker_container_globals:
+  registry_server: docker.io
+  registry_project: apachepulsar
+  image_name: pulsar-all
+  image_tag: 2.6.1
+  config_filename: pulsar-broker.conf
+  container_command: 'bin/pulsar broker'
+  container_log_driver: json-file
+  container_log_options:
+    max-size: "10m"
+    max-file: "1"
+  pulsar_jvm_max_heap_memory: 3g
+  pulsar_jvm_max_direct_memory: 3g
+
+pulsar_functions_worker_container_globals:
+  registry_server: docker.io
+  registry_project: apachepulsar
+  image_name: pulsar-all
+  image_tag: 2.6.1
+  config_filename: pulsar-functions-worker.yml
+  container_command: 'bin/pulsar functions-worker'
+  container_log_driver: json-file
+  container_log_options:
+    max-size: "10m"
+    max-file: "1"
+  pulsar_jvm_max_heap_memory: 3g
+  pulsar_jvm_max_direct_memory: 3g
+
+pulsar_proxy_container_globals:
+  registry_server: docker.io
+  registry_project: apachepulsar
+  image_name: pulsar-all
+  image_tag: 2.6.1
+  config_filename: pulsar-proxy.conf
+  container_command: 'bin/pulsar proxy'
+  container_log_driver: json-file
+  container_log_options:
+    max-size: "10m"
+    max-file: "1"
+  pulsar_jvm_max_heap_memory: 2g
+  pulsar_jvm_max_direct_memory: 2g
+
+pulsar_zookeeper_containers:
+  - container_name: pulsar-zookeeper
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 8000
+      - 2181
+      - 9990
+      - 2888
+      - 3888
+    container_published_ports:
+      - 8000:8000
+      - 2181:2181
+      - 9990:9990
+      - 2888:2888
+      - 3888:3888
+    container_volumes:
+      - /docker/pulsar-zookeeper/pulsar-zookeeper.conf:/pulsar/conf/zookeeper.conf
+      - /docker/pulsar-zookeeper/data:/pulsar/data
+    container_env:
+      PULSAR_MEM: " -Xms{{ pulsar_zookeeper_container_globals.pulsar_jvm_max_heap_memory }} -Xmx{{ pulsar_zookeeper_container_globals.pulsar_jvm_max_heap_memory }} -XX:MaxDirectMemorySize={{ pulsar_zookeeper_container_globals.pulsar_jvm_max_direct_memory }}"
+
+pulsar_bookkeeper_containers:
+  - container_name: pulsar-bookkeeper
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 8001
+      - 3181
+    container_published_ports:
+      - 8001:8001
+      - 3181:3181
+    container_volumes:
+      - /docker/pulsar-bookkeeper/pulsar-bookkeeper.conf:/pulsar/conf/bookkeeper.conf
+      - /docker/pulsar-bookkeeper/data:/pulsar/data
+    container_env:
+      PULSAR_MEM: " -Xms{{ pulsar_bookkeeper_container_globals.pulsar_jvm_max_heap_memory }} -Xmx{{ pulsar_bookkeeper_container_globals.pulsar_jvm_max_heap_memory }} -XX:MaxDirectMemorySize={{ pulsar_bookkeeper_container_globals.pulsar_jvm_max_direct_memory }}"
+
+pulsar_broker_containers:
+  - container_name: pulsar-broker
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 8080
+      - 6650
+    container_published_ports:
+      - 8080:8080
+      - 6650:6650
+    container_volumes:
+      - /docker/pulsar-broker/pulsar-broker.conf:/pulsar/conf/broker.conf
+    container_env:
+      PULSAR_MEM: " -Xms{{ pulsar_broker_container_globals.pulsar_jvm_max_heap_memory }} -Xmx{{ pulsar_broker_container_globals.pulsar_jvm_max_heap_memory }} -XX:MaxDirectMemorySize={{ pulsar_broker_container_globals.pulsar_jvm_max_direct_memory }}"
+
+pulsar_functions_worker_containers:
+  - container_name: pulsar-functions-worker
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 6750
+    container_published_ports:
+      - 6750:6750
+    container_volumes:
+      - /docker/pulsar-functions-worker/pulsar-functions-worker.yml:/pulsar/conf/functions_worker.yml
+    container_env:
+      PULSAR_MEM: " -Xms{{ pulsar_functions_worker_container_globals.pulsar_jvm_max_heap_memory }} -Xmx{{ pulsar_functions_worker_container_globals.pulsar_jvm_max_heap_memory }} -XX:MaxDirectMemorySize={{ pulsar_functions_worker_container_globals.pulsar_jvm_max_direct_memory }}"
+
+pulsar_proxy_containers:
+  - container_name: pulsar-proxy
+    container_networks:
+      - name: br-local
+    container_exposed_ports:
+      - 8081
+      - 6651
+    container_published_ports:
+      - 8081:8081
+      - 6651:6651
+    container_volumes:
+      - /docker/pulsar-proxy/pulsar-proxy.conf:/pulsar/conf/proxy.conf
+    container_env:
+      PULSAR_MEM: " -Xms{{ pulsar_proxy_container_globals.pulsar_jvm_max_heap_memory }} -Xmx{{ pulsar_proxy_container_globals.pulsar_jvm_max_heap_memory }} -XX:MaxDirectMemorySize={{ pulsar_proxy_container_globals.pulsar_jvm_max_direct_memory }}"

@@ -1,0 +1,15 @@
+---
+docker_apt_arch: amd64
+docker_apt_release_channel: stable
+
+bootstrap_pulsar_zookeeper: False
+bootstrap_pulsar_disk: False
+
+pulsar_cluster_name: "local"
+
+pulsar_web_service_port: 8080
+pulsar_web_service_url: "{{ hostvars[groups['pulsar'][0]].ansible_default_ipv4.address }}:{{ pulsar_web_service_port }}"
+pulsar_broker_service_port: 6650
+pulsar_broker_service_url: "{{ hostvars[groups['pulsar'][0]].ansible_default_ipv4.address }}:{{ pulsar_broker_service_port }}"
+
+pulsar_data_vol_size: 800g

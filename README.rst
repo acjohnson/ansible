@@ -41,6 +41,33 @@ Install dependent roles
 Usage
 *****
 
+docker-pulsar
+=============
+
+- You will need 3 x 4GB VMs at a minimum with root ssh keys installed and configured
+- Swap out the IP addresses in ``inventories/pulsar``
+- Review the defaults in ``group_vars/pulsar.yml`` and adjust if needed
+
+**Note**: All pulsar related configuration templates live in ``roles/configure_container/templates``
+
+- Run the ``playbook_pulsar.yml`` playbook against all 3 nodes (The playbook will fail to run if you run it against a single node)
+**Note**: Use ``bootstrap_pulsar_zookeeper=true`` only when creating a brand new and empty pulsar cluster
+
+.. code-block:: bash
+
+  # ansible-playbook -i inventories/pulsar -e "bootstrap_pulsar_zookeeper=true" --limit pulsar playbook_pulsar.yml
+
+Uninstall pulsar
+================
+If you would like to start over and recreate the pulsar containers run this *VERY DESTRUCTIVE* command
+which will delete everything except for the very large pulsar docker image...
+
+.. code-block:: bash
+
+  # ansible pulsar -i inventories/pulsar -m shell -b -a 'docker stop $(docker ps -qa); docker rm $(docker ps -qa); docker volume rm $(docker volume ls -q); docker network rm $(docker network ls -q); rm -rf /docker'
+
+You can now re-run ``playbook_pulsar.yml`` to deploy a new pulsar cluster
+
 ffmpeg media video optimizer
 ============================
 Run the ``playbook_ffmpeg.yml`` playbook to scan a directory of video files (eg. Movies or TV Shows)

@@ -1,44 +1,47 @@
 ---
-- name: Install base packages
-  package:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - sudo
-    - lvm2
-    - xfsprogs
-    - mlocate
-    - vim
-    - git
-    - tig
-    - python-pip
-    - pciutils
-    - lshw
-    - curl
-    - binutils
-    - unzip
-    - rsync
-    - strace
-    - tmux
-    - procps
-    - psmisc
+- block:
+  - name: Install base packages
+    package:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - sudo
+      - lvm2
+      - xfsprogs
+      - mlocate
+      - vim
+      - git
+      - tig
+      - pciutils
+      - lshw
+      - curl
+      - binutils
+      - unzip
+      - rsync
+      - strace
+      - tmux
+      - procps
+      - psmisc
 
-- name: Set fqdn hostname
-  hostname:
-    name: "{{ fqdn_hostname }}"
+  - name: Set fqdn hostname
+    hostname:
+      name: "{{ fqdn_hostname }}"
 
-- name: "sysctl - Set swapiness to 0"
-  sysctl:
-    name: vm.swappiness
-    value: 0
-    state: present
+  - name: "sysctl - Set swapiness to 0"
+    sysctl:
+      name: vm.swappiness
+      value: 0
+      state: present
 
-- name: "sysctl - Disable IPv6"
-  sysctl:
-    name: "net.ipv6.conf.{{ item }}.disable_ipv6"
-    value: 1
-    sysctl_set: yes
-  with_items:
-    - all
-    - default
-    - "{{ ansible_interfaces }}"
+  - name: "sysctl - Disable IPv6"
+    sysctl:
+      name: "net.ipv6.conf.{{ item }}.disable_ipv6"
+      value: 1
+      sysctl_set: yes
+    with_items:
+      - all
+      - default
+      - "{{ ansible_interfaces }}"
+
+  become: yes
+  become_user: root

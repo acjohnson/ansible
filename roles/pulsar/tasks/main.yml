@@ -1,0 +1,229 @@
+---
+- block:
+
+  - name: Gather package facts
+    package_facts:
+      manager: auto
+
+  - name: Check if docker-ce package is installed
+    debug:
+      msg: "{{ ansible_facts.packages['docker-ce'] | length }} version(s) of docker-ce are installed!"
+    when: "'docker-ce' in ansible_facts.packages"
+
+  - name: Set skip_docker variable
+    set_fact:
+      skip_docker: True
+    when: "'docker-ce' in ansible_facts.packages"
+
+  - name: Install pip.
+    package:
+      name: python3-pip
+      state: present
+
+  - name: Install docker-py.
+    pip:
+      name: docker-py
+      state: present
+
+  - name: Run docker role only on new clusters or if force_update is defined
+    include_role:
+      name: docker
+    when: (force_update is defined) or (skip_docker is undefined)
+
+  - name: Create br-local network
+    docker_network:
+      name: br-local
+
+  - name: Include Disk Setup tasks
+    include_tasks: "disk_setup.yml"
+    when:
+      - bootstrap_pulsar_disk | bool
+
+  - name: Set ZooKeeper connect string variable
+    set_fact:
+      pulsar_zookeeper_servers: "{{ groups['pulsar']|map('extract', hostvars, ['ansible_default_ipv4', 'address'])|map('regex_replace', '^(.*)$', '\\1:2181') | join(',') }}"
+
+  become: yes
+
+- name: Configure pulsar_zookeeper container
+  include_role:
+    name: configure_container
+  vars:
+    container_name: "{{ pulsar_zookeeper_config_item.container_name }}"
+    config_filename: "{{ pulsar_zookeeper_container_globals.config_filename }}"
+    configure_container: True
+    custom_tasks: True
+    container_type: pulsar_zookeeper
+  with_items:
+    - "{{ pulsar_zookeeper_containers }}"
+  loop_control:
+    loop_var: pulsar_zookeeper_config_item
+
+- name: Create pulsar_zookeeper container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ pulsar_zookeeper_container_globals.registry_server }}"
+    registry_project: "{{ pulsar_zookeeper_container_globals.registry_project }}"
+    image_name: "{{ pulsar_zookeeper_container_globals.image_name }}"
+    image_tag: "{{ pulsar_zookeeper_container_globals.image_tag }}"
+    container_name: "{{ pulsar_zookeeper_item.container_name }}"
+    container_command: "{{ pulsar_zookeeper_container_globals.container_command }}"
+    container_exposed_ports: "{{ pulsar_zookeeper_item.container_exposed_ports }}"
+    container_published_ports: "{{ pulsar_zookeeper_item.container_published_ports }}"
+    container_volumes: "{{ pulsar_zookeeper_item.container_volumes }}"
+    container_networks: "{{ pulsar_zookeeper_item.container_networks }}"
+    container_log_driver: "{{ pulsar_zookeeper_container_globals.container_log_driver }}"
+    container_log_options: "{{ pulsar_zookeeper_container_globals.container_log_options }}"
+    container_env: "{{ pulsar_zookeeper_item.container_env }}"
+  with_items:
+    - "{{ pulsar_zookeeper_containers }}"
+  loop_control:
+    loop_var: pulsar_zookeeper_item
+
+- name: Bootstrap Pulsar ZooKeeper
+  include_tasks: "bootstrap_pulsar_zookeeper.yml"
+  when: bootstrap_pulsar_zookeeper | bool
+
+- name: Configure pulsar_bookkeeper container
+  include_role:
+    name: configure_container
+  vars:
+    container_name: "{{ pulsar_bookkeeper_config_item.container_name }}"
+    config_filename: "{{ pulsar_bookkeeper_container_globals.config_filename }}"
+    configure_container: True
+  with_items:
+    - "{{ pulsar_bookkeeper_containers }}"
+  loop_control:
+    loop_var: pulsar_bookkeeper_config_item
+
+- name: Create pulsar_bookkeeper container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ pulsar_bookkeeper_container_globals.registry_server }}"
+    registry_project: "{{ pulsar_bookkeeper_container_globals.registry_project }}"
+    image_name: "{{ pulsar_bookkeeper_container_globals.image_name }}"
+    image_tag: "{{ pulsar_bookkeeper_container_globals.image_tag }}"
+    container_name: "{{ pulsar_bookkeeper_item.container_name }}"
+    container_command: "{{ pulsar_bookkeeper_container_globals.container_command }}"
+    container_exposed_ports: "{{ pulsar_bookkeeper_item.container_exposed_ports }}"
+    container_published_ports: "{{ pulsar_bookkeeper_item.container_published_ports }}"
+    container_volumes: "{{ pulsar_bookkeeper_item.container_volumes }}"
+    container_networks: "{{ pulsar_bookkeeper_item.container_networks }}"
+    container_log_driver: "{{ pulsar_bookkeeper_container_globals.container_log_driver }}"
+    container_log_options: "{{ pulsar_bookkeeper_container_globals.container_log_options }}"
+    container_env: "{{ pulsar_bookkeeper_item.container_env }}"
+  with_items:
+    - "{{ pulsar_bookkeeper_containers }}"
+  loop_control:
+    loop_var: pulsar_bookkeeper_item
+
+- name: Configure pulsar_broker container
+  include_role:
+    name: configure_container
+  vars:
+    container_name: "{{ pulsar_broker_config_item.container_name }}" 
+    config_filename: "{{ pulsar_broker_container_globals.config_filename }}" 
+    configure_container: True
+  with_items:
+    - "{{ pulsar_broker_containers }}" 
+  loop_control:
+    loop_var: pulsar_broker_config_item
+
+- name: Create pulsar_broker container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ pulsar_broker_container_globals.registry_server }}" 
+    registry_project: "{{ pulsar_broker_container_globals.registry_project }}" 
+    image_name: "{{ pulsar_broker_container_globals.image_name }}" 
+    image_tag: "{{ pulsar_broker_container_globals.image_tag }}" 
+    container_name: "{{ pulsar_broker_item.container_name }}" 
+    container_command: "{{ pulsar_broker_container_globals.container_command }}" 
+    container_exposed_ports: "{{ pulsar_broker_item.container_exposed_ports }}" 
+    container_published_ports: "{{ pulsar_broker_item.container_published_ports }}" 
+    container_volumes: "{{ pulsar_broker_item.container_volumes }}" 
+    container_networks: "{{ pulsar_broker_item.container_networks }}" 
+    container_log_driver: "{{ pulsar_broker_container_globals.container_log_driver }}" 
+    container_log_options: "{{ pulsar_broker_container_globals.container_log_options }}" 
+    container_env: "{{ pulsar_broker_item.container_env }}"
+  with_items:
+    - "{{ pulsar_broker_containers }}" 
+  loop_control:
+    loop_var: pulsar_broker_item
+
+- name: Configure pulsar_functions_worker container
+  include_role:
+    name: configure_container
+  vars:
+    container_name: "{{ pulsar_functions_worker_config_item.container_name }}"
+    config_filename: "{{ pulsar_functions_worker_container_globals.config_filename }}"
+    configure_container: True
+  with_items:
+    - "{{ pulsar_functions_worker_containers }}"
+  loop_control:
+    loop_var: pulsar_functions_worker_config_item
+
+- name: Create pulsar_functions_worker container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ pulsar_functions_worker_container_globals.registry_server }}"
+    registry_project: "{{ pulsar_functions_worker_container_globals.registry_project }}"
+    image_name: "{{ pulsar_functions_worker_container_globals.image_name }}"
+    image_tag: "{{ pulsar_functions_worker_container_globals.image_tag }}"
+    container_name: "{{ pulsar_functions_worker_item.container_name }}"
+    container_command: "{{ pulsar_functions_worker_container_globals.container_command }}"
+    container_exposed_ports: "{{ pulsar_functions_worker_item.container_exposed_ports }}"
+    container_published_ports: "{{ pulsar_functions_worker_item.container_published_ports }}"
+    container_volumes: "{{ pulsar_functions_worker_item.container_volumes }}"
+    container_networks: "{{ pulsar_functions_worker_item.container_networks }}"
+    container_log_driver: "{{ pulsar_functions_worker_container_globals.container_log_driver }}"
+    container_log_options: "{{ pulsar_functions_worker_container_globals.container_log_options }}"
+    container_env: "{{ pulsar_functions_worker_item.container_env }}"
+  with_items:
+    - "{{ pulsar_functions_worker_containers }}"
+  loop_control:
+    loop_var: pulsar_functions_worker_item
+
+- name: Configure pulsar_proxy container
+  include_role:
+    name: configure_container
+  vars:
+    container_name: "{{ pulsar_proxy_config_item.container_name }}"
+    config_filename: "{{ pulsar_proxy_container_globals.config_filename }}"
+    configure_container: True
+  with_items:
+    - "{{ pulsar_proxy_containers }}"
+  loop_control:
+    loop_var: pulsar_proxy_config_item
+
+- name: Create pulsar_proxy container
+  include_role:
+    name: create_container
+  vars:
+    registry_server: "{{ pulsar_proxy_container_globals.registry_server }}"
+    registry_project: "{{ pulsar_proxy_container_globals.registry_project }}"
+    image_name: "{{ pulsar_proxy_container_globals.image_name }}"
+    image_tag: "{{ pulsar_proxy_container_globals.image_tag }}"
+    container_name: "{{ pulsar_proxy_item.container_name }}"
+    container_command: "{{ pulsar_proxy_container_globals.container_command }}"
+    container_exposed_ports: "{{ pulsar_proxy_item.container_exposed_ports }}"
+    container_published_ports: "{{ pulsar_proxy_item.container_published_ports }}"
+    container_volumes: "{{ pulsar_proxy_item.container_volumes }}"
+    container_networks: "{{ pulsar_proxy_item.container_networks }}"
+    container_log_driver: "{{ pulsar_proxy_container_globals.container_log_driver }}"
+    container_log_options: "{{ pulsar_proxy_container_globals.container_log_options }}"
+    container_env: "{{ pulsar_proxy_item.container_env }}"
+  with_items:
+    - "{{ pulsar_proxy_containers }}"
+  loop_control:
+    loop_var: pulsar_proxy_item
+
+- name: "Disable Docker repo to avoid unexpected patching - [Debian]"
+  apt_repository:
+    repo: "deb [arch={{ docker_apt_arch }}] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+    state: absent
+  become: yes
+  when: ansible_facts['os_family'] == "Debian"

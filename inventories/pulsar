@@ -1,0 +1,7 @@
+[pulsar]
+pulsar-1 ansible_host=192.168.122.224 zid=0
+pulsar-2 ansible_host=192.168.122.225 zid=1
+pulsar-3 ansible_host=192.168.122.226 zid=2
+
+[pulsar:vars]
+ansible_user=root

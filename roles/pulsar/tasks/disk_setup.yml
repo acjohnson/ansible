@@ -1,0 +1,41 @@
+---
+- block:
+  - name: Install tuned
+    package:
+      name: tuned
+      state: latest
+
+  - name: Configure tuned with profile "latency-performance"
+    command: >
+      tuned-adm profile latency-performance
+
+  - name: Create pulsar volume group
+    lvg:
+      vg: pulsar
+      pvs: /dev/nvme0n1
+
+  - name: "Create a data LV with size {{ pulsar_data_vol_size }}"
+    lvol:
+      vg: pulsar
+      lv: data
+      size: "{{ pulsar_data_vol_size }}"
+
+  - name: Create /docker directory
+    file:
+      path: /docker
+      state: directory
+      mode: '0755'
+
+  - name: Playbook failure notice due to unformatted LV
+    debug:
+      msg: "The next task will fail until /dev/pulsar/data is manually formatted with mkfs.xfs..."
+
+  - name: Mount NVME to /opt/pulsar/data (filesystem must be formated manually...)
+    mount:
+      path: "/docker"
+      src: "/dev/pulsar/data"
+      fstype: xfs
+      opts: defaults,noatime,nodiscard
+      state: mounted
+
+  become: true

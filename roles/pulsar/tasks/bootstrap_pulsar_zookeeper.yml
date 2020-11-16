@@ -1,0 +1,30 @@
+---
+- block:
+  - name: "Initialize cluster metadata (Skip unless bootstrap_pulsar_zookeeper=true!)"
+    shell: |
+      sleep 5
+      docker exec -it pulsar-zookeeper bin/pulsar initialize-cluster-metadata \
+        --cluster {{ pulsar_cluster_name }} \
+        --zookeeper localhost:2181 \
+        --configuration-store localhost:2181 \
+        --web-service-url {{ pulsar_web_service_url }} \
+        --broker-service-url {{ pulsar_broker_service_url }}
+    register: shell_output
+
+  - name: Bootstrap command
+    debug:
+      msg: "{{ shell_output.cmd }}"
+
+  - name: Bootstrap command stdout
+    debug:
+      msg: "{{ shell_output.stdout_lines }}"
+
+  - name: Bootstrap command stderr
+    debug:
+      msg: "{{ shell_output.stderr }}"
+
+  become_user: root
+  become: yes
+  when:
+    - bootstrap_pulsar_zookeeper | bool
+    - groups['pulsar'][0] == inventory_hostname

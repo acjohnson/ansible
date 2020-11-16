@@ -1,0 +1,22 @@
+---
+- block:
+  - name: "Create {{ container_name }} data/zookeeper directory"
+    file:
+      path: "{{ config_dest_dir }}/data/zookeeper"
+      state: directory
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      recurse: True
+      mode: 0755
+
+  - name: Create myid file
+    template:
+      src: "pulsar-zookeeper-myid.j2"
+      dest: "{{ config_dest_dir }}/data/zookeeper/myid"
+      owner: "{{ owner_user }}"
+      group: "{{ owner_group }}"
+      mode: 0644
+
+  become: yes
+  become_user: root
+
