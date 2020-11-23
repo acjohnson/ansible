@@ -30,7 +30,7 @@
     debug:
       msg: "The next task will fail until /dev/pulsar/data is manually formatted with mkfs.xfs..."
 
-  - name: Mount NVME to /opt/pulsar/data (filesystem must be formated manually...)
+  - name: Mount NVME (filesystem must be formated manually...)
     mount:
       path: "/docker"
       src: "/dev/pulsar/data"
