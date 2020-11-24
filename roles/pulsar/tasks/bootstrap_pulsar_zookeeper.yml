@@ -27,4 +27,4 @@
   become: yes
   when:
     - bootstrap_pulsar_zookeeper | bool
-    - groups['pulsar'][0] == inventory_hostname
+    - groups[pulsar_group_name][0] == inventory_hostname
