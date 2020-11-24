@@ -1,5 +1,6 @@
 ---
 pulsar_cluster_name: pulsar
+pulsar_group_name: pulsar
 
 pulsar_zookeeper_container_globals:
   registry_server: docker.io

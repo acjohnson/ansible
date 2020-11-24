@@ -55,7 +55,7 @@ autopurge.purgeInterval=1
 # WARNING: it's not recommended to run a production ZK cluster with forceSync disabled.
 forceSync=yes
 
-{% for node in groups['pulsar'] %}
+{% for node in groups[pulsar_group_name] %}
 {% if ansible_default_ipv4.address == hostvars[node].ansible_default_ipv4.address %}
 server.{{ hostvars[node].zid }}=0.0.0.0:2888:3888
 {% else %}

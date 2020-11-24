@@ -39,10 +39,6 @@
     when:
       - bootstrap_pulsar_disk | bool
 
-  - name: Set ZooKeeper connect string variable
-    set_fact:
-      pulsar_zookeeper_servers: "{{ groups['pulsar']|map('extract', hostvars, ['ansible_default_ipv4', 'address'])|map('regex_replace', '^(.*)$', '\\1:2181') | join(',') }}"
-
   become: yes
 
 - name: Configure pulsar_zookeeper container

@@ -13,3 +13,6 @@ pulsar_broker_service_port: 6650
 pulsar_broker_service_url: "{{ hostvars[groups['pulsar'][0]].ansible_default_ipv4.address }}:{{ pulsar_broker_service_port }}"
 
 pulsar_data_vol_size: 800g
+
+pulsar_group_name: pulsar
+pulsar_zookeeper_servers: "{{ groups[pulsar_group_name]|map('extract', hostvars, ['ansible_default_ipv4', 'address'])|map('regex_replace', '^(.*)$', '\\1:2181') | join(',') }}"
