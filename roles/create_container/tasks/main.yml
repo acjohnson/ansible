@@ -4,6 +4,7 @@
     tag: "{{ image_tag }}"
     name: "{{ image_uri_no_tag }}"
     source: "pull"
+    force_source: yes
   become: true
 
 - name: Contents of changed_status_dict
