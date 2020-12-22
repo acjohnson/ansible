@@ -13,3 +13,7 @@ roundcube_plugins:
     url: https://github.com/6ec123321/filters/archive/master.zip
     extracted_folder: filters-master
     destination_folder: filters
+  - twofactor_gauthenticator:
+    url: https://github.com/alexandregz/twofactor_gauthenticator/archive/master.zip
+    extracted_folder: twofactor_gauthenticator-master
+    destination_folder: twofactor_gauthenticator
