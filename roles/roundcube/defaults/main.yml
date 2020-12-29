@@ -2,11 +2,11 @@
 roundcube_domain: example.com
 roundcube_smtp_fqdn: "{{ fqdn_hostname }}"
 roundcube_imap_fqdn: "{{ fqdn_hostname }}"
-roundcube_version: 1.4.9
+roundcube_version: 1.4.10
 roundcube_des_key: mustbe24charsinlength...
 roundcube_archive: "roundcubemail-{{ roundcube_version }}-complete.tar.gz"
 roundcube_url: "https://github.com/roundcube/roundcubemail/releases/download/{{ roundcube_version }}/{{ roundcube_archive }}"
-roundcube_checksum: sha256:9fac7463a1365ac30c097dc03c3e22d17a73920fa728069c122e60b9d4c8ecb2
+roundcube_checksum: sha256:a3d8c0dc4db70188f4aea3b62c1bd8b0b31b0c0f77f77138c0715e9d6ddd520f
 roundcube_db_string: "sqlite:////var/sqlite3/roundcube-{{ roundcube_version }}/sqlite.db?mode=0640"
 roundcube_plugins:
   - filters:
