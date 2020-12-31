@@ -24,7 +24,7 @@
     pip:
       name: docker
       state: present
-      executable: pip3
+      executable: pip
 
   - name: Run docker role only on new clusters or if force_update is defined
     include_role:
