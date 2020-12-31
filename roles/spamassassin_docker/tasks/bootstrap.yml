@@ -44,13 +44,17 @@
     with_items:
       - { src: "learn_spam.sh", dest: "/opt/learn_spam.sh" }
       - { src: "report_spam.pl", dest: "/opt/report_spam.pl" }
+      - { src: "run_spamassassin-maint.sh", dest: "/opt/run_spamassassin-maint.sh" }
 
   - name: Enable learn_spam and report_spam cron
     cron:
-      name: "learn_spam and report_spam"
-      minute: 30
-      hour: 2
-      job: "/opt/learn_spam.sh 2>&1 > /dev/null"
+      name: "{{ item.name }}"
+      minute: "{{ item.minute }}"
+      hour: "{{ item.hour }}"
+      job: "{{ item.job }}"
+    with_items:
+      - { name: "learn_spam and report_spam", hour: 2, minute: 30, job: "/opt/learn_spam.sh 2>&1 > /dev/null" }
+      - { name: "update spamassassin rules", hour: 3, minute: 30, job: "/opt/run_spamassassin-maint.sh > /var/log/spamassassin-maint.log 2>&1" }
 
   become_user: root
   become: yes

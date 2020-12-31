@@ -38,7 +38,7 @@ if(
          $file =~ s/([=:])/\\$1/g;
          print( "reporting $file\n" );
          system( "docker exec -i spamassassin $spamassassin -r < $path$file" );
-         system( "docker exec -i spamassassin $sa_learn --spam --no-sync $path" );
+         system( "docker exec -i spamassassin $sa_learn --spam --no-sync < $path$file" );
       } else {
          print( "Ignoring un-readable file $file\n" );
       }
