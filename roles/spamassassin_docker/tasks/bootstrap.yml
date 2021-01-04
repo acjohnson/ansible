@@ -54,7 +54,7 @@
       job: "{{ item.job }}"
     with_items:
       - { name: "learn_spam and report_spam", hour: 2, minute: 30, job: "/opt/learn_spam.sh 2>&1 > /dev/null" }
-      - { name: "update spamassassin rules", hour: 3, minute: 30, job: "/opt/run_spamassassin-maint.sh > /var/log/spamassassin-maint.log 2>&1" }
+      - { name: "update spamassassin rules", hour: 3, minute: 30, job: "/opt/run_spamassassin-maint.sh 2>&1 > /dev/null" }
 
   become_user: root
   become: yes
