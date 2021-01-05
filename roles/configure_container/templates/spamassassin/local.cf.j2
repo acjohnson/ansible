@@ -15,7 +15,8 @@ razor_config /etc/mail/spamassassin/razor-agent.conf
 
 ifplugin Mail::SpamAssassin::Plugin::Pyzor
 pyzor_path /usr/bin/pyzor
-pyzor_options --debug --log-file /var/log/pyzor.log --homedir /etc/mail/spamassassin/.pyzor
+## One of these options causes pyzor Traceback messages somehow...
+#pyzor_options --debug --log-file /var/log/pyzor.log --homedir /etc/mail/spamassassin/.pyzor
 endif
 
 # datavibe.net spamassassin local config as of 2015-07-17
