@@ -4,10 +4,6 @@
 
 - block:
 
-  - name: Include Custom Tasks
-    include_tasks: "{{ container_type }}_tasks.yml"
-    when: custom_tasks
-
   - name: "Create {{ container_name }} config directory"
     file:
       path: "{{ config_dest_dir }}"
@@ -15,6 +11,10 @@
       owner: "{{ owner_user }}"
       group: "{{ owner_group }}"
       mode: 0755
+
+  - name: Include Custom Tasks
+    include_tasks: "{{ container_type }}_tasks.yml"
+    when: custom_tasks
 
   - name: "Configure {{ container_name }} with {{ config_filename }}"
     template:
