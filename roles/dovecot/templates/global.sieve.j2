@@ -8,3 +8,7 @@ if header :contains "subject" {{ sieve_spam_subjects }} {
   fileinto "Spam";
   stop;
 }
+if header :contains "from" {{ sieve_spam_whitelist }} {
+   fileinto "Inbox";
+   stop;
+}
