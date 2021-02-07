@@ -52,6 +52,9 @@
     group: postfix 
     mode: '0640'
 
+- name: Run postfix set-permissions
+  shell: "/sbin/postfix set-permissions"
+
 - name: Ensure postfix is started and enabled
   service:
     name: postfix
