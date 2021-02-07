@@ -4,6 +4,11 @@
     name: nginx-full
     state: latest
 
+- name: Install haveged for entropy
+  package:
+    name: haveged
+    state: latest
+
 - name: Configure nginx
   template:
     src: nginx.conf.j2
@@ -45,6 +50,11 @@
   with_items:
     - { src: "cert.pem.j2", dest: "{{ nginx_roundcube_ssl_dir }}/cert.pem", mode: "0644" }
     - { src: "key.pem.j2", dest: "{{ nginx_roundcube_ssl_dir }}/key.pem", mode: "0600" }
+
+- name: Generate dhparams.pem (one-time only, takes long time...)
+  shell:
+    cmd: /bin/openssl dhparam -out /etc/nginx/dhparam.pem 4096
+    creates: /etc/nginx/dhparam.pem
 
 - name: Ensure nginx service is enabled and running
   service:

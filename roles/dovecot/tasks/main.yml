@@ -29,7 +29,7 @@
     path: /etc/dovecot/sieve
     mode: 0755
     owner: dovecot
-    group: root
+    group: dovecot
 
 - name: Configure dovecot
   template:
@@ -37,7 +37,7 @@
     dest: "{{ item.dest }}"
     mode: 0644
     owner: dovecot
-    group: root
+    group: dovecot
   with_items:
     - { src: "dovecot.conf.j2", dest: "/etc/dovecot/dovecot.conf" }
     - { src: "global.sieve.j2", dest: "/etc/dovecot/sieve/global.sieve" }
@@ -67,7 +67,7 @@
     state: directory
     mode: 0755
     owner: dovecot
-    group: root
+    group: dovecot
   when: manage_mail_certs | bool == true
 
 - name: Create SSL certificate files
@@ -76,12 +76,24 @@
     dest: "{{ dovecot_ssl_dir }}/{{ item.filename }}"
     mode: "{{ item.mode }}"
     owner: dovecot
-    group: root
+    group: dovecot
   with_items:
     - { filename: "ca.pem", mode: "0644" }
     - { filename: "cert.pem", mode: "0644" }
     - { filename: "key.pem", mode: "0400" }
   when: manage_mail_certs | bool == true
+
+- name: Generate custom DH parameters file
+  shell: "openssl dhparam -out /etc/dovecot/dh2048.pem 2048"
+  args:
+    creates: /etc/dovecot/dh2048.pem
+
+- name: Set DH parameters file permissions
+  file:
+    path: '/etc/dovecot/dh2048.pem'
+    owner: dovecot
+    group: dovecot
+    mode: '0640'
 
 - name: Ensure dovecot is enabled and running
   service:
