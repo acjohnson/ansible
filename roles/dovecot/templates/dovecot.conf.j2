@@ -2,6 +2,9 @@
 
 auth_mechanisms = plain login
 
+# Default to no fsyncing (see https://wiki.dovecot.org/MailLocation/LocalDisk)
+mail_fsync = never
+
 # Remove domain name from username:
 auth_username_format = %Ln
 auth_default_realm = {{ dovecot_domain }}
@@ -112,4 +115,5 @@ protocol lda {
   mail_plugins = sieve
   postmaster_address = postmaster@{{ dovecot_domain }}
   sendmail_path = /usr/lib/sendmail
+  mail_fsync = optimized
 }
