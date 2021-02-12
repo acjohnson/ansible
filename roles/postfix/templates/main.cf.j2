@@ -16,6 +16,7 @@ delay_warning_time = 4h
 readme_directory = no
 
 tls_random_source = dev:/dev/urandom
+tls_eecdh_ultra_curve = X448 X25519
 
 # SMTP TLS parameters
 smtp_use_tls = yes
@@ -45,6 +46,7 @@ smtpd_tls_dh1024_param_file = /etc/postfix/dh2048.pem
 smtpd_tls_auth_only = yes
 smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
 smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_eecdh_grade = ultra
 
 # Reject unlisted sender and recipient
 smtpd_reject_unlisted_recipient = yes
