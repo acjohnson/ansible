@@ -54,6 +54,15 @@
     owner: www-data
     group: www-data
 
+- name: "Copy database from previous Roundcube version"
+  copy:
+    src: "/var/sqlite3/roundcube-{{ roundcube_previous_version }}/sqlite.db"
+    dest: "/var/sqlite3/roundcube-{{ roundcube_version }}/sqlite.db"
+    owner: www-data
+    group: www-data
+    mode: '0640'
+  when: roundcube_previous_version | regex_search('^(\d+\.)?(\d+\.)?(\*|\d+)$')
+
 - name: Install roundcube plugins
   unarchive:
     src: "{{ item.url }}"

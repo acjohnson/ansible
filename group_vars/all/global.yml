@@ -10,6 +10,7 @@ postfix_ssl_cert_file: "{{ mail_ssl_dir }}/pcdomain.com.pem"
 postfix_ssl_key_file: "{{ mail_ssl_dir }}/pcdomain.com.pem"
 
 nginx_roundcube_server_port: 443
+roundcube_previous_version: "1.4.10"
 
 dovecot_ssl_dir: "{{ mail_ssl_dir }}"
 postfix_ssl_dir: "{{ mail_ssl_dir }}"
