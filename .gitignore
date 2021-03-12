@@ -5,3 +5,5 @@ roles/nginx/templates/key.pem.j2
 group_vars/all/secret.yml
 host_vars/127.0.0.1
 roles/docker
+facts/
+ansible.log
