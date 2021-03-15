@@ -3,3 +3,6 @@ roles:
   - name: docker
     version: 3.0.0
     src: https://github.com/geerlingguy/ansible-role-docker
+  - name: node_exporter
+    version: 263b54cc151b66e0380c3e3c5cccdbe205f58b23
+    src: https://github.com/geerlingguy/ansible-role-node_exporter
