@@ -1,0 +1,20 @@
+---
+- block:
+
+  - name: "Create recover-space.sh script"
+    template:
+      src: "recover-space.sh.j2"
+      dest: "/opt/recover-space.sh"
+      owner: "root"
+      group: "root"
+      mode: 0755
+
+  - name: Enable recover-space.sh cron
+    cron:
+      name: "recover-space"
+      minute: "{{59|random(seed=inventory_hostname)}}"
+      hour: "1"
+      job: "/opt/recover-space.sh 2>&1 > /var/log/recover-space.log"
+
+  become: yes
+  become_user: root

@@ -1,0 +1,15 @@
+#!/bin/bash -x
+
+for pid in $(pgrep fstrim); do
+    if [ $pid != $$ ]; then
+        echo "[$(date)] : Process is already running with PID $pid"
+        exit 1
+    fi
+done
+
+/sbin/fstrim -v /
+{% if fstrim_additional_filesystems %}
+    {%- for fs in fstrim_additional_filesystems %}
+/sbin/fstrim -v {{ fs }}
+    {%- endfor %}
+{% endif %}
