@@ -31,6 +31,14 @@
     owner: dovecot
     group: dovecot
 
+- name: "Ensure {{ dovecot_index_dir }} directory exists"
+  file:
+    state: directory
+    path: "{{ dovecot_index_dir }}"
+    mode: 0750
+    owner: vmail
+    group: mail
+
 - name: Configure dovecot
   template:
     src: "{{ item.src }}"

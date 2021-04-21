@@ -17,7 +17,7 @@ last_valid_uid = 5000
 log_path = /var/log/dovecot.log
 log_timestamp = "%Y-%m-%d %H:%M:%S "
 mail_access_groups = dovecot
-mail_location = maildir:/home/vmail/%d/%n/Maildir
+mail_location = maildir:/home/vmail/%d/%n/Maildir:INDEX={{ dovecot_index_dir }}/%d/%n
 mail_privileged_group = mail
 
 passdb {
@@ -102,7 +102,7 @@ ssl_key = <{{ dovecot_ssl_key_file }}
 ssl_verify_client_cert = no
 auth_ssl_require_client_cert = no
 auth_ssl_username_from_cert = no
-verbose_ssl = yes
+verbose_ssl = no
 
 userdb {
   driver = static
