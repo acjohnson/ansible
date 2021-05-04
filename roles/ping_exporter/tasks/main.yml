@@ -1,0 +1,44 @@
+---
+- block:
+  - name: Download ping_exporter into /opt
+    get_url:
+      url: "{{ ping_exporter_download_url }}"
+      dest: /opt
+      mode: '0755'
+      checksum: "{{ ping_exporter_checksum }}"
+
+  - name: Install fping
+    package:
+      name: fping
+      state: latest
+
+  - name: Create ping_exporter user
+    user:
+      name: ping_exporter
+      shell: /sbin/nologin
+      state: present
+
+  - name: Copy the ping_exporter systemd unit file
+    template:
+      src: ping_exporter.service.j2
+      dest: /etc/systemd/system/ping_exporter.service
+      mode: 0644
+
+  - name: Reload systemd daemon if unit file is changed.
+    systemd:
+      daemon_reload: true
+
+  - name: Ensure ping_exporter is running and enabled
+    service:
+      name: ping_exporter
+      enabled: yes
+      state: restarted
+
+  - name: Verify node_exporter is responding to requests.
+    uri:
+      url: http://127.0.0.1:8085/?target=127.0.0.1"
+      return_content: true
+    register: metrics_output
+    failed_when: "'ping_min' not in metrics_output.content"
+
+  become: true

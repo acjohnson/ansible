@@ -1,0 +1,10 @@
+[Unit]
+Description=Ping Exporter for Prometheus (Created By Frankie)
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /opt/ping-exporter.py
+
+[Install]
+WantedBy=multi-user.target
