@@ -9,8 +9,11 @@
 
   - name: Install fping
     package:
-      name: fping
+      name: "{{ item }}"
       state: latest
+    with_items:
+      - fping
+      - python2
 
   - name: Create ping_exporter user
     user:
