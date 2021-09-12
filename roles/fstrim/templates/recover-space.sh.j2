@@ -7,9 +7,14 @@ for pid in $(pgrep fstrim); do
     fi
 done
 
-/sbin/fstrim -v /
-{% if fstrim_additional_filesystems %}
-    {%- for fs in fstrim_additional_filesystems %}
+{% if fstrim_filesystems %}
+    {%- for fs in fstrim_filesystems.stdout_lines -%}
 /sbin/fstrim -v {{ fs }}
-    {%- endfor %}
+    {% endfor -%}
 {% endif %}
+
+if [ -x /usr/bin/docker ]; then
+    /usr/bin/docker image prune -af
+else
+    echo "docker does not appear to be installed, skipping image prune..."
+fi

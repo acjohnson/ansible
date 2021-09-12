@@ -1,6 +1,11 @@
 ---
 - block:
 
+  - name: Get list of mounted ext3/4 and xfs filesystems
+    shell: |
+      /usr/bin/awk '{if ($3 ~ /^ext.*/ || $3 == "xfs") print $2}' /proc/mounts | grep -v kubelet
+    register: fstrim_filesystems
+
   - name: "Create recover-space.sh script"
     template:
       src: "recover-space.sh.j2"
