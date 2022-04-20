@@ -20,10 +20,13 @@ dovecot_domain: "{{ mail_domain }}"
 postfix_domain: "{{ mail_domain }}"
 roundcube_domain: "{{ mail_domain }}"
 
+denyhosts_branch: master
+denyhosts_orgname: denyhosts
 denyhosts_allowed_hosts:
   - homeserv.kristyandaaron.com
   - emby.thejohnsons.site
   - mail.pcdomain.com
+  - 135.181.129.17
   - 195.201.96.41
   - 216.201.72.28
   - 216.201.72.47

@@ -221,7 +221,7 @@ HOSTNAME_LOOKUP=YES
 #LOCK_FILE = /var/lock/subsys/denyhosts
 #
 # Debian or Gentoo
-LOCK_FILE = /var/run/denyhosts.pid
+LOCK_FILE = /run/denyhosts.pid
 #
 # Misc
 #LOCK_FILE = /tmp/denyhosts.lock
@@ -246,6 +246,7 @@ IPTABLES = {{ denyhosts_iptables_wrapper }}
 {% else %}
 IPTABLES = /sbin/iptables
 {% endif %}
+
 #
 # Warning: If you are running IPTABLES, please make sure to comment
 # out the PFCTL_PATH and the PF_TABLE variables below. PF and
@@ -315,13 +316,17 @@ IPTABLES = /sbin/iptables
 
 #######################################################################
 #
-# SMTP_HOST and SMTP_PORT: if DenyHosts is configured to email
+# SMTP_HOST, SMTP_PORT and SMTP_SSL: if DenyHosts is configured to email
 # reports (see ADMIN_EMAIL) then these settings specify the
-# email server address (SMTP_HOST) and the server port (SMTP_PORT)
+# email server address (SMTP_HOST) and the server port (SMTP_PORT).
+# If SMTP_SSL is set to yes, an SMTPS connection will be established
+# immediately. Otherwise, if the server supports ESTMP and announces
+# STARTTLS support, it will be used.
 #
 #
 SMTP_HOST = localhost
 SMTP_PORT = 25
+SMTP_SSL = yes
 #
 #######################################################################
 
@@ -508,11 +513,8 @@ AGE_RESET_INVALID=25d
 # See this faq entry for more details:
 #    http://denyhost.sf.net/faq.html#userdef_regex
 #
-# Note:
-# SSHD_FORMAT_REGEX is required in order for USERDEF_FAILED_ENTRY_REGEX to work with dovecot!
-#
-SSHD_FORMAT_REGEX=.* (sshd.*:|\[sshd\]|auth:) (?P<message>.*)
-USERDEF_FAILED_ENTRY_REGEX=dovecot.*authentication failure.*ruser=(?P<user>\S+).*rhost=(::ffff:)?(?P<host>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
+#USERDEF_FAILED_ENTRY_REGEX=
+USERDEF_FAILED_ENTRY_REGEX=dropbear.*Max.*reached.*user\W(?P<user>\S+).*from\W(::ffff:)?(?P<host>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})
 #
 #
 ######################################################################
@@ -617,7 +619,6 @@ DAEMON_PURGE = 1h
 #
 #######################################################################
 
-
 #######################################################################
 #
 # SYNC_SERVER: The central server that communicates with DenyHost
@@ -626,7 +627,16 @@ DAEMON_PURGE = 1h
 # To disable synchronization (the default), do nothing.
 #
 # To enable synchronization, you must uncomment the following line:
-#SYNC_SERVER = http://sync.denyhosts.org:9911
+SYNC_SERVER = http://sync.denyhosts.org:9911
+#
+#######################################################################
+
+#######################################################################
+#
+# SYNC_VERSION: whether to sync your python and denyhosts version to the sync server
+# The default is yes.
+#
+SYNC_VERSION = yes
 #
 #######################################################################
 
