@@ -9,7 +9,9 @@
     paths: "{{ find_base }}"
     size: "{{ min_file_size }}"
     patterns: "*.{{ files_list_item }}"
-    excludes: "*_RECODE.mp4"
+    excludes:
+      - "*_RECODE.mp4"
+      - "*_SKIP*"
     recurse: yes
   register: files_list
   loop_control:
