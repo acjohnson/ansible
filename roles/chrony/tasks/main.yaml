@@ -1,0 +1,21 @@
+---
+- name: Install chrony
+  package:
+    name: chrony
+    state: latest
+
+- name: Ensure chrony service is enabled and running
+  service:
+    name: chrony
+    enabled: yes
+    state: started
+
+- name: Ensure network time synchronization is active and enabled
+  shell: |
+    timedatectl set-ntp true
+
+- name: Restart chrony service
+  service:
+    name: chrony
+    enabled: yes
+    state: restarted
