@@ -1,0 +1,22 @@
+---
+- name: "Get English audio track"
+  get_audio_track:
+    input_file: "{{ item[1].path }}"
+  register: audio_track_index
+
+- name: "Encoding..."
+  environment:
+    SOURCE: "{{ item[1].path }}"
+    AUDIO_TRACK: "{{ audio_track_index.audio_track }}"
+  shell: |
+    ffmpeg -y -i "${SOURCE}" \
+    -threads "{{ ffmpeg_threads }}" \
+    -vcodec "{{ ffmpeg_vcodec }}" \
+    -b:v "{{ ffmpeg_vbitrate }}" \
+    -filter:v "{{ ffmpeg_vfilter }}" \
+    -acodec "{{ ffmpeg_acodec }}" \
+    -ab "{{ ffmpeg_abitrate }}" \
+    -map "0:v:0" \
+    -map "0:a:${AUDIO_TRACK}" \
+    "${SOURCE%.{{ item[0].files_list_item }}}_RECODE.mp4"
+    rm -f "${SOURCE}"

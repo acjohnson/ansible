@@ -29,19 +29,8 @@
     - "{{ files_list.results }}"
     - files
 
-- name: "Encoding..."
-  shell: |
-    ffmpeg -y -i "${SOURCE}" \
-    -threads "{{ ffmpeg_threads }}" \
-    -vcodec "{{ ffmpeg_vcodec }}" \
-    -b:v "{{ ffmpeg_vbitrate }}" \
-    -filter:v "{{ ffmpeg_vfilter }}" \
-    -acodec "{{ ffmpeg_acodec }}" \
-    -ab "{{ ffmpeg_abitrate }}" \
-    "${SOURCE%.{{ item[0].files_list_item }}}_RECODE.mp4"
-    rm -f "${SOURCE}"
-  environment:
-    SOURCE: "{{ item[1].path }}"
+- name: "Iterate encode.yml tasks"
+  include_tasks: encode.yml
   with_subelements:
     - "{{ files_list.results }}"
     - files
