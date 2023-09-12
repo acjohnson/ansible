@@ -18,3 +18,9 @@ if [ -x /usr/bin/docker ]; then
 else
     echo "docker does not appear to be installed, skipping image prune..."
 fi
+
+if [ -x /usr/bin/ctr ]; then
+    /usr/bin/ctr -n k8s.io i rm $(/usr/bin/ctr -n k8s.io i ls -q)
+else
+    echo "ctr does not appear to be installed, skipping image prune..."
+fi
