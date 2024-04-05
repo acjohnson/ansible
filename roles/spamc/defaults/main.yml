@@ -1,3 +1,4 @@
 ---
-# https://packages.debian.org/sid/amd64/spamc/download
-spamc_package_name: 'spamc_4.0.0~rc1+pre1-1_amd64.deb'
+# https://packages.debian.org/bullseye-backports/amd64/spamc/download
+# http://ftp.us.debian.org/debian/pool/main/s/spamassassin/spamc_4.0.0-1~bpo11+1_amd64.deb
+spamc_package_name: 'spamc_4.0.0-1~bpo11+1_amd64.deb'
