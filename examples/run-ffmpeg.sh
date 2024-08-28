@@ -15,8 +15,8 @@ done
 
 #source /root/ansible/venv/bin/activate
 
-ansible-playbook -i 127.0.0.1, /root/ansible/playbook_ffmpeg.yml -e "ansible_python_interpreter=/usr/bin/python3"
-ansible-playbook -i 127.0.0.1, /root/ansible/playbook_ffmpeg.yml -e "find_base=/library/Movies/ min_file_size=2300m ansible_python_interpreter=/usr/bin/python3"
+ansible-playbook -i 127.0.0.1, /root/ansible/playbook_ffmpeg.yml -e "min_file_size=390m ansible_python_interpreter=/usr/bin/python3"
+ansible-playbook -i 127.0.0.1, /root/ansible/playbook_ffmpeg.yml -e "find_base=/library/Movies/ min_file_size=2000m ansible_python_interpreter=/usr/bin/python3"
 
 date
 #deactivate

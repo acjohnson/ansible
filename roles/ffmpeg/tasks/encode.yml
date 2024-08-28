@@ -3,11 +3,12 @@
   get_audio_track:
     input_file: "{{ item[1].path }}"
   register: audio_track_index
+  when: english_audio_track_override is not defined
 
 - name: "Encoding..."
   environment:
     SOURCE: "{{ item[1].path }}"
-    AUDIO_TRACK: "{{ audio_track_index.audio_track }}"
+    AUDIO_TRACK: "{{ english_audio_track_override | default(audio_track_index.audio_track) }}"
   shell: |
     ffmpeg -y -i "${SOURCE}" \
     -threads "{{ ffmpeg_threads }}" \
