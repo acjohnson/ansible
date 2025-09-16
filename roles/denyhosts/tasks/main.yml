@@ -1,5 +1,10 @@
 ---
-- name: Install python-pip package
+- name: Install rsyslog package
+  apt:
+    name: rsyslog
+    state: latest
+
+- name: Install python3-pip package
   apt:
     name: python3-pip
     state: latest
@@ -12,12 +17,17 @@
       - pip
       - ipaddr
     state: latest
-    executable: pip2
+    virtualenv: "{{ denyhosts_path }}/venv"
 
-- name: "Install denyhosts from {{ denyhosts_branch }} branch/tag"
+- name: Remove old denyhosts config
+  file:
+    name: /etc/denyhosts.conf
+    state: absent
+    
+- name: "Install denyhosts from github.com/{{ denyhosts_orgname }}/{{ denyhosts_reponame }}.git@{{ denyhosts_branch }}"
   pip:
-    name: "git+ssh://git@github.com/{{ denyhosts_orgname }}/{{ denyhosts_reponame }}.git@{{ denyhosts_branch }}#egg=DenyHosts"
-    executable: pip2
+    name: "git+https://github.com/{{ denyhosts_orgname }}/{{ denyhosts_reponame }}.git@{{ denyhosts_branch }}#egg=DenyHosts"
+    virtualenv: "{{ denyhosts_path }}/venv"
 
 - name: Ensure /var/lib/denyhosts exists
   file:
@@ -50,6 +60,12 @@
 - name: Issue systemctl daemon-reload in case unit file changed
   systemd:
     daemon_reload: yes
+
+- name: Ensure rsyslog is enabled and running
+  service:
+    name: rsyslog
+    enabled: yes
+    state: restarted
 
 - name: Ensure denyhosts is enabled and running
   service:

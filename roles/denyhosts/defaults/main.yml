@@ -3,3 +3,4 @@ denyhosts_branch: master
 denyhosts_allowed_hosts: []
 denyhosts_orgname: denyhosts
 denyhosts_reponame: denyhosts
+denyhosts_path: /opt/denyhosts

@@ -5,7 +5,7 @@ Before=sshd.service
 [Service]
 Type=forking
 ExecStartPre=/bin/rm -f /run/denyhosts.pid
-ExecStart=/usr/local/bin/denyhosts.py --daemon --config=/etc/denyhosts.conf --debug
+ExecStart=/bin/bash -c 'source {{ denyhosts_path }}/venv/bin/activate && python {{ denyhosts_path }}/venv/bin/denyhosts.py --daemon --config=/etc/denyhosts.conf --debug'
 PIDFile=/run/denyhosts.pid
 TimeoutSec=1200
 
