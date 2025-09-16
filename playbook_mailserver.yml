@@ -7,7 +7,3 @@
     - postfix
     - dovecot
     - denyhosts
-    - roundcube
-    - php_fpm
-    - nginx
-    - certbot

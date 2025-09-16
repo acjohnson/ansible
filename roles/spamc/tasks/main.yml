@@ -1,10 +1,6 @@
 ---
-- name: Copy spamassassin client package
-  copy:
-    src: "{{ spamc_package_name }}"
-    dest: /tmp/
-
 - name: Install spamassassin client package
-  apt:
-    deb: "/tmp/{{ spamc_package_name }}"
+  package:
+    name: "{{ spamc_package_name }}"
+    state: latest
     update_cache: yes
