@@ -8,7 +8,7 @@
       - sudo
       - lvm2
       - xfsprogs
-      - mlocate
+      - locate
       - vim
       - git
       - tig
@@ -42,6 +42,7 @@
       - all
       - default
       - "{{ ansible_interfaces }}"
+    ignore_errors: yes
 
   become: yes
   become_user: root

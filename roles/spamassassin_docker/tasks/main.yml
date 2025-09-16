@@ -18,13 +18,12 @@
   - name: Install pip.
     package:
       name: python3-pip
-      state: present
+      state: latest
 
   - name: Install Docker SDK for Python
-    pip:
-      name: docker
-      state: present
-      executable: pip
+    package:
+      name: python3-docker
+      state: latest
 
   - name: Run docker role only on new clusters or if force_update is defined
     include_role:

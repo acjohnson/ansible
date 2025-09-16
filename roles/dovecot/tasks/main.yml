@@ -91,18 +91,6 @@
     - { filename: "key.pem", mode: "0400" }
   when: manage_mail_certs | bool == true
 
-- name: Generate custom DH parameters file
-  shell: "openssl dhparam -out /etc/dovecot/dh2048.pem 2048"
-  args:
-    creates: /etc/dovecot/dh2048.pem
-
-- name: Set DH parameters file permissions
-  file:
-    path: '/etc/dovecot/dh2048.pem'
-    owner: dovecot
-    group: dovecot
-    mode: '0640'
-
 - name: Ensure dovecot is enabled and running
   service:
     name: dovecot
