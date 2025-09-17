@@ -4,3 +4,7 @@ denyhosts_allowed_hosts: []
 denyhosts_orgname: denyhosts
 denyhosts_reponame: denyhosts
 denyhosts_path: /opt/denyhosts
+denyhosts_iptables_wrapper: /usr/local/bin/iptables-wrapper.sh
+denyhosts_iptables_wrapper_port: 22
+denyhosts_iptables_wrapper_host: 192.168.100.254
+denyhosts_iptables_wrapper_user: root
