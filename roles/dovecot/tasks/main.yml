@@ -39,6 +39,11 @@
     owner: vmail
     group: mail
 
+- name: Ensure /etc/dovecot/conf.d directory and all its contents is absent
+  file:
+    path: /etc/dovecot/conf.d
+    state: absent
+
 - name: Configure dovecot
   template:
     src: "{{ item.src }}"
