@@ -2,7 +2,7 @@
 spamassassin_container_globals:
   registry_server: registry.thejohnsons.site
   image_name: debianbased
-  image_tag: spamassassin
+  image_tag: spamassassin-4.0.2
   container_command: ''
   container_log_driver: "json-file"
   container_log_options:
