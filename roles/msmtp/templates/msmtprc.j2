@@ -3,7 +3,7 @@ port 587
 tls on
 tls_starttls on
 tls_trust_file /etc/ssl/certs/ca-certificates.crt
-host "{{ msmtp_host }}"
+host {{ msmtp_host }}
 from {{ msmtp_from }}
 auth on
 user {{ msmtp_username }}
