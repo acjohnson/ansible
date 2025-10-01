@@ -22,6 +22,7 @@
       - tmux
       - procps
       - psmisc
+      - anacron
 
   - name: Set fqdn hostname
     hostname:
