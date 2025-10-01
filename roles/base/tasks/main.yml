@@ -23,6 +23,7 @@
       - procps
       - psmisc
       - anacron
+      - prometheus-node-exporter
 
   - name: Set fqdn hostname
     hostname:
