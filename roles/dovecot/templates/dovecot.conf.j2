@@ -24,8 +24,22 @@ mail_fsync = never
 
 # Mail storage settings (split from old mail_location syntax)
 mail_driver = maildir
-mail_path = /home/vmail/%{user | domain}/%{user | username}/Maildir
-mail_index_path = /var/dovecot/indexes/%{user | domain}/%{user | username}
+mail_path = /home/vmail%{user | domain}/%{user | username}/Maildir
+mail_index_path = /var/dovecot/indexes%{user | domain}/%{user | username}
+
+mail_plugins = fts fts_flatcurve
+fts_driver = flatcurve
+fts_autoindex = yes
+fts_flatcurve_substring_search = yes
+
+language en {
+  default = yes
+}
+
+language_tokenizers = generic email-address
+
+fts flatcurve {
+}
 
 listen = 0.0.0.0
 
@@ -36,7 +50,7 @@ userdb passwd {
   fields {
     uid  = vmail
     gid  = mail
-    home = /home/vmail/%{user | domain}/%{user | username}
+    home = /home/vmail%{user | domain}/%{user | username}
   }
 }
 
@@ -120,6 +134,7 @@ auth_ssl_username_from_cert = no
 protocol imap {
   imap_max_line_length = 64k
   mail_max_userip_connections = 20
+  mail_plugins = fts fts_flatcurve
 }
 
 sieve_script global_before {
@@ -131,7 +146,7 @@ sieve_script global_before {
 # Local delivery agent (LDA) / Sieve hooks
 protocol lda {
   auth_socket_path = /var/run/dovecot/auth-master
-  mail_plugins = sieve
+  mail_plugins = sieve fts fts_flatcurve
   postmaster_address = postmaster@{{ dovecot_domain }}
   sendmail_path = /usr/lib/sendmail
   mail_fsync = optimized

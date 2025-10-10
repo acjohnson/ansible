@@ -7,6 +7,7 @@
     - dovecot-core
     - dovecot-imapd
     - dovecot-sieve
+    - dovecot-flatcurve
 
 - name: Ensure mail group exists
   group:
