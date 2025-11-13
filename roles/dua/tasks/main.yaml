@@ -1,0 +1,29 @@
+---
+- name: Download dua-cli
+  ansible.builtin.get_url:
+    url: "{{ dua_url }}"
+    dest: "/tmp/{{ dua_archive }}"
+    checksum: "{{ dua_checksum }}"
+
+- name: Unarchive dua-cli
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ dua_archive }}"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Install dua binary
+  ansible.builtin.copy:
+    src: "/tmp/{{ dua_basename }}/dua"
+    dest: /usr/local/bin/dua
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: yes
+
+- name: Clean up temporary files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop:
+    - { path: "/tmp/{{ dua_archive }}" }
+    - { path: "/tmp/{{ dua_basename }}" }

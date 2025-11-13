@@ -1,0 +1,6 @@
+---
+dua_version: v2.32.2
+dua_basename: "dua-{{ dua_version }}-{{ ansible_architecture }}-unknown-linux-musl"
+dua_archive: "{{ dua_basename }}.tar.gz"
+dua_url: "https://github.com/Byron/dua-cli/releases/download/{{ dua_version }}/{{ dua_archive }}"
+dua_checksum: "sha256:b9c5440b4a5b7fe3118392f2d2e5a31353bc8f825378a448fc542d09b9743053"
