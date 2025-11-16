@@ -21,7 +21,7 @@
     recreate: "{{ container_recreate }}"
     command: "{{ (container_command == '') | ternary(omit, container_command) }}"
     env: "{{ (container_env == {}) | ternary(omit, container_env) }}"
-    exposed_ports: "{{ (container_exposed_ports == []) | ternary(omit, container_exposed_ports) }} | int"
+    exposed_ports: "{{ (container_exposed_ports == []) | ternary(omit, container_exposed_ports) }}"
     published_ports: "{{ (container_published_ports == []) | ternary(omit, container_published_ports) }}"
     volumes: "{{ (container_volumes == []) | ternary(omit, container_volumes) }}"
     sysctls: "{{ (container_sysctls == {}) | ternary(omit, container_sysctls) }}"
