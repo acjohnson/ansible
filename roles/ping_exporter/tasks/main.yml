@@ -1,4 +1,9 @@
 ---
+- name: Check if systemd is available
+  ansible.builtin.fail:
+    msg: "This playbook requires systemd, but it is not available on this system"
+  when: ansible_service_mgr != 'systemd'
+
 - block:
   - name: Download ping_exporter into /opt
     get_url:
@@ -38,7 +43,7 @@
 
   - name: Verify node_exporter is responding to requests.
     uri:
-      url: http://127.0.0.1:8085/?target=127.0.0.1"
+      url: "http://127.0.0.1:8085/?target=127.0.0.1"
       return_content: true
     register: metrics_output
     failed_when: "'ping_min' not in metrics_output.content"
