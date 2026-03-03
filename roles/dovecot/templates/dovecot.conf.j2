@@ -32,7 +32,7 @@ fts_driver = flatcurve
 fts_autoindex = yes
 fts_flatcurve_substring_search = yes
 
-default_vsz_limit = 4096M
+default_vsz_limit = 6144M
 
 fts_header_includes {
   From = yes
@@ -97,7 +97,7 @@ service anvil {
 
 service imap-login {
   executable = /usr/lib/dovecot/imap-login
-  vsz_limit = 1024M 
+  vsz_limit = 1536M
 
   inet_listener imap {
     # disable non-SSL IMAP
@@ -113,7 +113,7 @@ service imap-login {
 
 service imap {
   executable = /usr/lib/dovecot/imap
-  vsz_limit = 1024M
+  vsz_limit = 1536M
 }
 
 service stats {
