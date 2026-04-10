@@ -11,6 +11,10 @@
 #dns_query_restriction allow zen.spamhaus.org
 #dns_query_restriction deny spamhaus.org mailspike.net spamcop.net
 
+# Disable broken/defunct DNSBL lookups
+dns_query_restriction deny ix.dnsbl.manitu.net
+dns_query_restriction deny ctyme.ixhash.net
+
 razor_config /etc/mail/spamassassin/razor-agent.conf
 
 ifplugin Mail::SpamAssassin::Plugin::Pyzor
